@@ -1,11 +1,11 @@
 # Fdb version 4
-["xdvipdfmx"] 1747304526.0353 "main.xdv" "main.pdf" "main" 1747304526.50341 0
-  "main.xdv" 1747304525.98638 5692 fcad32404c79211cfc162c962307208c "xelatex"
+["xdvipdfmx"] 1747305918.91453 "main.xdv" "main.pdf" "main" 1747305919.28606 0
+  "main.xdv" 1747305918.86703 5692 d888a886c37c7ee657444c3c96b8d8fd "xelatex"
   (generated)
   "main.pdf"
   (rewritten before read)
-["xelatex"] 1747304524.3395 "/Users/davidruiz/Documents/Ingeniería Matemática III/Aprendizaje Automático/Proyecto/Proyecto-AA/LaTeX/main.tex" "main.xdv" "main" 1747304526.50206 0
-  "/Users/davidruiz/Documents/Ingeniería Matemática III/Aprendizaje Automático/Proyecto/Proyecto-AA/LaTeX/main.tex" 1747304524.11232 2375 c4ca227f8bf88358a88224eff89097e1 ""
+["xelatex"] 1747305917.68516 "/Users/davidruiz/Documents/Ingeniería Matemática III/Aprendizaje Automático/Proyecto/Proyecto-AA/LaTeX/main.tex" "main.xdv" "main" 1747305919.28474 0
+  "/Users/davidruiz/Documents/Ingeniería Matemática III/Aprendizaje Automático/Proyecto/Proyecto-AA/LaTeX/main.tex" 1747305917.48205 2375 c4ca227f8bf88358a88224eff89097e1 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
   "/usr/local/texlive/2024/texmf-dist/tex/generic/atbegshi/atbegshi.sty" 1575674566 24708 5584a51a7101caf7e6bbf1fc27d8f7b1 ""
@@ -147,9 +147,9 @@
   "/usr/local/texlive/2024/texmf-dist/web2c/texmf.cnf" 1708706663 41649 5d6ae549fbbcb850a863f69aa41f3d10 ""
   "/usr/local/texlive/2024/texmf-var/web2c/xetex/xelatex.fmt" 1714412665 10850195 95ae7d0fffa83e91ac048aff16e4f784 ""
   "/usr/local/texlive/2024/texmf.cnf" 1710266656 577 e590dabc9e28c5b61546e15f63eebcdf ""
-  "img/ceu.png" 1747304523.87382 30709 dfd2d9ff0333d0a5ff361ed67269a054 ""
-  "main.aux" 1747304525.9851 333 8ec50dce62d37ccff305104eb3a375bb "xelatex"
-  "main.out" 1747304525.96867 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
+  "img/ceu.png" 1747305823.52374 30709 dfd2d9ff0333d0a5ff361ed67269a054 ""
+  "main.aux" 1747305918.86574 333 8ec50dce62d37ccff305104eb3a375bb "xelatex"
+  "main.out" 1747305918.85036 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
   (generated)
   "main.aux"
   "main.log"
