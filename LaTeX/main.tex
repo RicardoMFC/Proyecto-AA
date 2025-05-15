@@ -1,0 +1,71 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{fontspec}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{geometry}
+\geometry{top=0cm, bottom=0cm, left=0cm, right=0cm}
+
+\setmainfont{Times New Roman}
+\usepackage{fontawesome5}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\includegraphics[width=2cm]{img/ceu.png}}
+\fancyhead[R]{\includegraphics[width=2cm]{img/ceu.png}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
+\usepackage{setspace}
+\setstretch{1.5}
+\usepackage{lipsum} % Para generar texto de ejemplo
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{hyperref}  
+
+% Colores corporativos
+\definecolor{azulceu}{HTML}{003B5C}
+\definecolor{grisclaro}{HTML}{F7F7F7}
+
+\begin{document}
+\begin{titlepage}
+\begin{tikzpicture}[remember picture, overlay]
+
+  % Fondo general gris claro
+  \fill[grisclaro] (current page.south west) rectangle (current page.north east);
+
+  % Franja vertical azul a la izquierda
+  \fill[azulceu] (current page.south west) rectangle ([xshift=6cm]current page.north west);
+
+  % Logo en la parte superior izquierda
+  \node[anchor=north west, xshift=0.5cm, yshift=-1.2cm] at (current page.north west)
+    {\includegraphics[width=5cm]{img/ceu.png}};
+
+  % Título centrado en la franja azul
+  \node[align=center, text=white, font=\bfseries\LARGE] at ([xshift=3cm, yshift=-7cm]current page.north west)
+    {MEMORIA \\ PROYECTO};
+
+  % Universidad o título institucional (opcional)
+  \node[align=left, text=black, font=\bfseries\large] at ([xshift=12.5cm, yshift=10.5cm]current page.south west)
+    {Universidad CEU San Pablo};
+
+  % Autores del trabajo
+  \node[align=center, text=black, font=\Large\itshape] at ([xshift=12.5cm, yshift=6.8cm]current page.south west)
+    {David Ruiz Luque\\Alberto García Caballero\\Ricardo Marín Fernández-Conde};
+
+% Fecha centrada
+\node[align=center, text=black, font=\normalsize] at ([xshift=12.5cm, yshift=2.8cm]current page.south west)
+    {15 de abril de 2025};  
+
+
+
+
+\end{tikzpicture}
+\end{titlepage}
+\end{document}
