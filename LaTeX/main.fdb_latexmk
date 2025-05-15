@@ -1,11 +1,11 @@
 # Fdb version 4
-["xdvipdfmx"] 1747305918.91453 "main.xdv" "main.pdf" "main" 1747305919.28606 0
-  "main.xdv" 1747305918.86703 5692 d888a886c37c7ee657444c3c96b8d8fd "xelatex"
+["xdvipdfmx"] 1747307383.91158 "main.xdv" "main.pdf" "main" 1747307384.28543 0
+  "main.xdv" 1747307383.8632 7052 7e0829832dd9f3196741900f76d9ded4 "xelatex"
   (generated)
   "main.pdf"
   (rewritten before read)
-["xelatex"] 1747305917.68516 "/Users/davidruiz/Documents/Ingeniería Matemática III/Aprendizaje Automático/Proyecto/Proyecto-AA/LaTeX/main.tex" "main.xdv" "main" 1747305919.28474 0
-  "/Users/davidruiz/Documents/Ingeniería Matemática III/Aprendizaje Automático/Proyecto/Proyecto-AA/LaTeX/main.tex" 1747305917.48205 2375 c4ca227f8bf88358a88224eff89097e1 ""
+["xelatex"] 1747307382.66902 "/Users/davidruiz/Documents/Ingeniería Matemática III/Aprendizaje Automático/Proyecto/Proyecto-AA/LaTeX/main.tex" "main.xdv" "main" 1747307384.28407 0
+  "/Users/davidruiz/Documents/Ingeniería Matemática III/Aprendizaje Automático/Proyecto/Proyecto-AA/LaTeX/main.tex" 1747307382.46481 2677 2f88bd74bc9ef524386c22d2d1036b4f ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
   "/usr/local/texlive/2024/texmf-dist/tex/generic/atbegshi/atbegshi.sty" 1575674566 24708 5584a51a7101caf7e6bbf1fc27d8f7b1 ""
@@ -126,8 +126,6 @@
   "/usr/local/texlive/2024/texmf-dist/tex/latex/l3kernel/expl3.sty" 1708463273 6565 10e89ed128ccd59431746bbdd82129fc ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/l3packages/l3keys2e/l3keys2e.sty" 1708376303 4674 4240ebde863d19dc4d13bb280b78abb2 ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/l3packages/xparse/xparse.sty" 1708376303 9327 11bedad2ac38f92e405a38ed18489a03 ""
-  "/usr/local/texlive/2024/texmf-dist/tex/latex/lipsum/lipsum.ltd.tex" 1632168149 95525 6fd0552101a6b1f9b7a84b402ec435ba ""
-  "/usr/local/texlive/2024/texmf-dist/tex/latex/lipsum/lipsum.sty" 1632168149 14690 c2c754218a7108db7823a4839c1bc3cd ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty" 1601326656 1090 bae35ef70b3168089ef166db3e66f5b2 ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty" 1673816307 373 00b204b1d7d095b892ad31a7494b0373 ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-0-65.sty" 1601326656 21013 f4ff83d25bb56552493b030f27c075ae ""
@@ -148,8 +146,8 @@
   "/usr/local/texlive/2024/texmf-var/web2c/xetex/xelatex.fmt" 1714412665 10850195 95ae7d0fffa83e91ac048aff16e4f784 ""
   "/usr/local/texlive/2024/texmf.cnf" 1710266656 577 e590dabc9e28c5b61546e15f63eebcdf ""
   "img/ceu.png" 1747305823.52374 30709 dfd2d9ff0333d0a5ff361ed67269a054 ""
-  "main.aux" 1747305918.86574 333 8ec50dce62d37ccff305104eb3a375bb "xelatex"
-  "main.out" 1747305918.85036 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
+  "main.aux" 1747307383.86163 333 8ec50dce62d37ccff305104eb3a375bb "xelatex"
+  "main.out" 1747307383.84357 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
   (generated)
   "main.aux"
   "main.log"

@@ -7,7 +7,13 @@
 \usepackage{geometry}
 \geometry{top=0cm, bottom=0cm, left=0cm, right=0cm}
 
+% Fuente principal del documento
 \setmainfont{Times New Roman}
+
+% Fuente elegante para el título
+\newfontfamily\TituloElegante{EB Garamond}
+
+% Otros paquetes útiles
 \usepackage{fontawesome5}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -23,11 +29,8 @@
 \titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
 \usepackage{setspace}
 \setstretch{1.5}
-\usepackage{lipsum} % Para generar texto de ejemplo
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{amsthm}
-\usepackage{hyperref}  
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{hyperref}
 
 % Colores corporativos
 \definecolor{azulceu}{HTML}{003B5C}
@@ -47,24 +50,26 @@
   \node[anchor=north west, xshift=0.5cm, yshift=-1.2cm] at (current page.north west)
     {\includegraphics[width=5cm]{img/ceu.png}};
 
-  % Título centrado en la franja azul
+  % Título dentro de la franja azul
   \node[align=center, text=white, font=\bfseries\LARGE] at ([xshift=3cm, yshift=-7cm]current page.north west)
-    {MEMORIA \\ PROYECTO};
+    {MEMORIA\\PROYECTO};
 
-  % Universidad o título institucional (opcional)
-  \node[align=left, text=black, font=\bfseries\large] at ([xshift=12.5cm, yshift=10.5cm]current page.south west)
+  % Título principal elegante
+  \node[align=center, text=azulceu, font=\TituloElegante\bfseries\fontsize{20pt}{24pt}\selectfont] 
+    at ([xshift=13.5cm, yshift=-15cm]current page.north west)
+    {Aprendizaje Automático:\\[0.7em] \textsc{Predicción del Rendimiento Académico}};
+
+  % Universidad
+  \node[align=left, text=black, font=\bfseries\large] at ([xshift=13.5cm, yshift=10.5cm]current page.south west)
     {Universidad CEU San Pablo};
 
   % Autores del trabajo
-  \node[align=center, text=black, font=\Large\itshape] at ([xshift=12.5cm, yshift=6.8cm]current page.south west)
+  \node[align=center, text=black, font=\Large\itshape] at ([xshift=13.5cm, yshift=6.8cm]current page.south west)
     {David Ruiz Luque\\Alberto García Caballero\\Ricardo Marín Fernández-Conde};
 
-% Fecha centrada
-\node[align=center, text=black, font=\normalsize] at ([xshift=12.5cm, yshift=2.8cm]current page.south west)
-    {15 de abril de 2025};  
-
-
-
+  % Fecha centrada
+  \node[align=center, text=black, font=\normalsize] at ([xshift=13.5cm, yshift=2.8cm]current page.south west)
+    {15 de abril de 2025};
 
 \end{tikzpicture}
 \end{titlepage}

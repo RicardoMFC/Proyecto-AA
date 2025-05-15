@@ -177,10 +177,6 @@ INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/titlesec/titlesec.sty
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/titlesec/titlesec.sty
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/setspace/setspace.sty
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/setspace/setspace.sty
-INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/lipsum/lipsum.sty
-INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/lipsum/lipsum.sty
-INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/lipsum/lipsum.ltd.tex
-INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/lipsum/lipsum.ltd.tex
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/amsmath/amsmath.sty
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/amsmath/amsmath.sty
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/amsmath/amsopn.sty
