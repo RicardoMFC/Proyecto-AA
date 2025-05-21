@@ -1,11 +1,11 @@
 # Fdb version 4
-["xdvipdfmx"] 1747842733.95723 "main.xdv" "main.pdf" "main" 1747842736.05764 0
-  "main.xdv" 1747842733.87632 453260 e339527d8089991f9dddee472995f991 "xelatex"
+["xdvipdfmx"] 1747864494.35935 "main.xdv" "main.pdf" "main" 1747864497.42862 0
+  "main.xdv" 1747864494.27861 478888 61060413be82f12523afba8920ba7f99 "xelatex"
   (generated)
   "main.pdf"
   (rewritten before read)
-["xelatex"] 1747842730.5524 "/Users/davidruiz/Documents/Ingeniería Matemática III/Aprendizaje Automático/Proyecto/Proyecto-AA/LaTeX/main.tex" "main.xdv" "main" 1747842736.05596 0
-  "/Users/davidruiz/Documents/Ingeniería Matemática III/Aprendizaje Automático/Proyecto/Proyecto-AA/LaTeX/main.tex" 1747842730.30034 46940 8223a84b591f5f7b5ab94dd21ff1f5d8 ""
+["xelatex"] 1747864492.10766 "/Users/davidruiz/Documents/Ingeniería Matemática III/Aprendizaje Automático/Proyecto/Proyecto-AA/LaTeX/main.tex" "main.xdv" "main" 1747864497.42686 0
+  "/Users/davidruiz/Documents/Ingeniería Matemática III/Aprendizaje Automático/Proyecto/Proyecto-AA/LaTeX/main.tex" 1747864489.11199 55398 eca72f036543dad2f1dc15f772ce4cdc ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/adobe/symbol/psyr.tfm" 1136768653 1408 5937f58aa508ea2cea4901c07d10f5fe ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
@@ -13,6 +13,7 @@
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmmi12.tfm" 1136768653 1524 4414a8315f39513458b80dfc63bff03a ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmmi6.tfm" 1136768653 1512 f21f83efb36853c0b70002322c1ab3ad ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmmi8.tfm" 1136768653 1520 eccf95517727cb11801f4f1aee3a21b4 ""
+  "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmmi9.tfm" 1136768653 1524 d89e2d087a9828407a196f428428ef4a ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmr10.tfm" 1254269338 12056 7e13df7fe4cbce21b072ba7c4f4deb6e ""
   "/usr/local/texlive/2024/texmf-dist/tex/generic/atbegshi/atbegshi.sty" 1575674566 24708 5584a51a7101caf7e6bbf1fc27d8f7b1 ""
   "/usr/local/texlive/2024/texmf-dist/tex/generic/babel-spanish/spanish.ldf" 1622145181 26965 3b6d1655ad716f98e788b1fb9f2e87b8 ""
@@ -111,6 +112,7 @@
   "/usr/local/texlive/2024/texmf-dist/tex/latex/base/size11.clo" 1705352648 8464 59874a3b0776c73e2a138b025d8473dd ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/base/textcomp.sty" 1705352648 2894 fc64867f9d198785eabe71a88276a9cb ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/base/ts1enc.def" 1705352648 8090 f16408278fc28f119d5a6757c212f57e ""
+  "/usr/local/texlive/2024/texmf-dist/tex/latex/booktabs/booktabs.sty" 1579038678 6078 f1cb470c9199e7110a27851508ed7a5c ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/caption/caption.sty" 1696191071 56128 c2ccf1a29d78c33bc553880402e4fb9a ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/caption/caption3.sty" 1696191071 72619 ee90b6612147680fd73c3b1406a74245 ""
   "/usr/local/texlive/2024/texmf-dist/tex/latex/chngcntr/chngcntr.sty" 1525297854 4336 84bc4a8edb126e69abec1a67dc0c36cf ""
@@ -180,16 +182,23 @@
   "/usr/local/texlive/2024/texmf-dist/web2c/texmf.cnf" 1708706663 41649 5d6ae549fbbcb850a863f69aa41f3d10 ""
   "/usr/local/texlive/2024/texmf-var/web2c/xetex/xelatex.fmt" 1714412665 10850195 95ae7d0fffa83e91ac048aff16e4f784 ""
   "/usr/local/texlive/2024/texmf.cnf" 1710266656 577 e590dabc9e28c5b61546e15f63eebcdf ""
-  "img/afd_a_tag.png" 1747842548.52888 31829 0bdc91542ffbed3dc5e6c8817de811eb ""
-  "img/afd_img_tag.png" 1747842548.5259 19152 cbfd38673b4f0754c8cc3dd67af23230 ""
+  "img/accuracy_modelos_basicos.png" 1747863287.22252 20568 c09b3a7534280d708562f06518d10396 ""
   "img/ceu.png" 1747558701.49483 30709 dfd2d9ff0333d0a5ff361ed67269a054 ""
   "img/ceubw.png" 1747842128.88494 12069 b608087dac8a805ad499c68180f0b2c1 ""
-  "img/cross_test_ok.png" 1747842548.51934 21691 a85b40e02b550cc82cc25ed26d652530 ""
-  "img/ejecucion_prueba3.png" 1747842548.52291 168046 c6b8c4ef94f30830c4ec19052af7aa6d ""
-  "img/errores_parser.png" 1747842548.51287 40153 8c592af6f4a05e174f553ef285d79699 ""
-  "main.aux" 1747842733.86572 4867 38082a7abbdf281b1943fadd80365842 "xelatex"
-  "main.out" 1747842733.86722 6866 c9131740055435dd21d90411c9f61199 "xelatex"
-  "main.toc" 1747842733.8762 3061 4b275a9d1ef0a1dcb5b90d5684995692 "xelatex"
+  "img/distribucion_clases_esp.png" 1747863588.55909 13135 503390f4e3cfca173044f99bb9d7fc7c ""
+  "img/frecuencia_arr.png" 1747856311.3725 13088 ff2d55f7c0be1ca5fac25c93053da1b7 ""
+  "img/frecuencia_as.png" 1747856317.75585 13838 5a19b139b567708ae891f2ea58b1b8e0 ""
+  "img/frecuencia_atd.png" 1747856334.99882 14884 653c658f2b9f34961bd8b52903970836 ""
+  "img/frecuencia_cst.png" 1747856284.32369 14643 d42b4cd6b66eba0a32bbd2877d50f1b5 ""
+  "img/frecuencia_esp.png" 1747856303.58015 14797 e58551d461748dbbf7678348d3711348 ""
+  "img/frecuencia_ge.png" 1747856272.84866 12747 bad4f014a3f438e2ecda81377007d553 ""
+  "img/frecuencia_nf.png" 1747856325.02402 15219 814703c5b22c6fb5771a981af59cf104 ""
+  "img/frecuencia_tnp.png" 1747856292.95523 15072 94d7219eec9ca18046d893b5bcfae520 ""
+  "img/matriz_confusion_mlp.png" 1747863511.515 15421 935accc901deb3822fdcedc4d05ae1f0 ""
+  "img/matriz_cramers_v.png" 1747857316.9499 225256 1d2c2c1ac5704611bf52858088329775 ""
+  "main.aux" 1747864494.26753 5632 f526a4ed97180057fcfa5ed90cadb3dd "xelatex"
+  "main.out" 1747864494.26931 7143 28d5f75bb94c5af6a1a8bde66a04a815 "xelatex"
+  "main.toc" 1747864494.27853 2761 4dc50e50b0b2c34a06e4c6d45ef8fd40 "xelatex"
   (generated)
   "main.aux"
   "main.log"

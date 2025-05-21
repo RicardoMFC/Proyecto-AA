@@ -8,6 +8,7 @@
 \usepackage{graphicx}
 \usepackage{geometry}
 \usepackage{tabularx}
+\usepackage{booktabs}
 \usepackage{xcolor}
 \usepackage{fancyhdr}
 \usepackage{titlesec}
@@ -28,7 +29,7 @@
 % ====== COLORES ======
 \definecolor{azulceu}{RGB}{0,70,140}
 \colorlet{azulceu}{azulceu!80!white}
-\definecolor{grisclaro}{gray}{0.98}
+\definecolor{grisclaro}{gray}{0.3}
 \definecolor{codegray}{gray}{0.95}
 \definecolor{linkblue}{RGB}{0, 102, 204}
 \hypersetup{
@@ -56,7 +57,7 @@
 \begin{tikzpicture}[remember picture, overlay]
 
   % Fondo general gris claro
-  \fill[grisclaro] (current page.south west) rectangle (current page.north east);
+  \fill[codegray] (current page.south west) rectangle (current page.north east);
 
   % Franja vertical azul a la izquierda
   \fill[azulceu] (current page.south west) rectangle ([xshift=6cm]current page.north west);
@@ -105,771 +106,1071 @@
 \fancyfoot[C]{\raisebox{-10pt}{\thepage}}
 
 
-% ====== RESUMEN ======
-
-\begin{minipage}[t]{0.48\textwidth}
-\raggedright
-\textbf{Resumen}
-\vspace{0.5em}
-
-En esta práctica se ha desarrollado un sistema de extracción de información (web scraping) aplicado a documentos HTML, combinando herramientas modernas con modelos formales de la teoría de lenguajes. Para ello, se ha implementado un analizador léxico con PLY, basado en autómatas finitos deterministas (AFD), y se ha comparado su funcionamiento con la librería \texttt{BeautifulSoup}, ampliamente utilizada en entornos reales.
-
-\vspace{0.5em}
-
-El objetivo principal ha sido explorar hasta qué punto los conceptos formales —como lenguajes regulares, expresiones regulares y gramáticas— pueden emplearse para resolver problemas prácticos. Además de implementar ambos enfoques, se ha desarrollado un sistema de validación cruzada y una batería de pruebas sobre archivos HTML de distinta complejidad, lo que ha permitido evaluar la robustez y precisión del sistema.
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.48\textwidth}
-\raggedright
-\textbf{Abstract}
-\vspace{0.5em}
-
-This project presents an information extraction (web scraping) system applied to HTML documents, combining formal language theory with practical tools. A lexical analyzer was implemented using PLY, based on deterministic finite automata (DFA), and compared to the \texttt{BeautifulSoup} library, widely used in real-world applications.
-
-\vspace{0.5em}
-
-The main objective was to explore the practical applicability of formal concepts —such as regular languages, regular expressions, and grammars— in solving real extraction tasks. Alongside the implementation of both methods, a cross-validation system and a set of tests over multiple HTML files were developed to evaluate robustness and accuracy.
-\end{minipage}
-
-\vspace{2.5em}
-
 % ====== INTRODUCCIÓN ======
 \section{Introducción}
 
-El web scraping es una técnica ampliamente utilizada para extraer información automáticamente de páginas web. Aunque en la práctica suele abordarse desde herramientas de alto nivel como \texttt{BeautifulSoup}, en esta memoria se ha querido enfocar el problema desde una perspectiva diferente: aplicar conceptos teóricos de la asignatura de Teoría de la Computación, como los autómatas finitos deterministas (AFD), para resolver el mismo problema.
+El aprendizaje automático es una disciplina fundamental dentro de la inteligencia artificial que permite a las máquinas aprender a partir de datos y tomar decisiones sin haber sido programadas explícitamente para cada tarea. En este proyecto, hemos aplicado diversas técnicas de aprendizaje automático con el objetivo de desarrollar un modelo capaz de predecir el rendimiento académico de estudiantes a partir de datos reales.
 
 \medskip
 
-La idea principal es construir autómatas que sean capaces de reconocer ciertas etiquetas HTML (concretamente \texttt{<a>} e \texttt{<img>}), y compararlos con un parser tradicional basado en el análisis del DOM. Esta aproximación permite comprobar de forma práctica hasta qué punto los modelos formales, vistos en un contexto teórico, pueden aplicarse a problemas del mundo real.
+La motivación detrás de este trabajo radica en la relevancia del rendimiento educativo como factor determinante en la trayectoria personal y profesional de los individuos. Comprender qué variables influyen en el desempeño académico puede ser de gran utilidad para instituciones educativas, docentes y responsables de políticas públicas.
 
 \medskip
 
-El proyecto se ha desarrollado en Python, haciendo uso de herramientas como \texttt{PLY} para implementar un lexer con expresiones regulares, y \texttt{Graphviz} para generar los grafos de los autómatas. Además, se han utilizado páginas HTML de prueba y se ha incluido un sistema de comparación entre métodos.
+El proyecto se ha desarrollado utilizando el conjunto de datos \textbf{Student Performance Data Set}, obtenido del \textit{UCI Machine Learning Repository}, una fuente de referencia en el ámbito académico. La información del dataset está disponible en el siguiente \href{https://archive.ics.uci.edu/ml/datasets/student+performance}{\textcolor{linkblue}{enlace}}. 
 
 \medskip
 
-La práctica no solo ha servido para reforzar los conocimientos teóricos adquiridos en clase, sino también para experimentar con sus limitaciones y contrastarlos con enfoques modernos, valorando sus ventajas e inconvenientes.
-
-%===== FUNDAMENTOS TEÓRICOS ======
-\section{Fundamentos teóricos}
-
-En esta sección se explican de forma sencilla los conceptos teóricos básicos que se han utilizado en la práctica. Nos centraremos en cómo los lenguajes regulares y los autómatas finitos deterministas (AFD) permiten detectar patrones en HTML, conectando así la teoría vista en clase con su aplicación práctica.
-
-\subsection{Lenguajes formales y AFD}
-
-Un \textbf{lenguaje formal} es un conjunto de cadenas sobre un alfabeto $\Sigma$. En esta práctica, las cadenas son fragmentos de código HTML y el alfabeto incluye caracteres como letras, números y símbolos especiales. Un lenguaje formal puede definirse mediante gramáticas o autómatas.
-
-Entre los lenguajes formales, los más simples son los \textbf{lenguajes regulares}, los cuales pueden describirse mediante \textbf{expresiones regulares} y reconocerse utilizando autómatas finitos.
-
-Un \textbf{autómata finito determinista} (AFD) es una 5-tupla:
-
-\[
-A = (Q, \Sigma, f, q_0, F)
-\]
-
-donde:
-\begin{itemize}\setlength\itemsep{0.2em}
-    \item $Q$ es el conjunto finito de estados.
-    \item $\Sigma$ es el alfabeto de entrada.
-    \item $f: Q \times \Sigma \rightarrow Q$ es la función de transición.
-    \item $q_0 \in Q$ es el estado inicial.
-    \item $F \subseteq Q$ es el conjunto de estados finales o de aceptación.
-\end{itemize}
-
-El autómata comienza en $q_0$ y avanza carácter a carácter según la función de transición $f$. Si al terminar la entrada está en un estado de $F$, la cadena se considera aceptada.
-
-\subsection{Tokens y analizadores léxicos}
-
-Un \textbf{token} es una unidad léxica que representa una estructura reconocible dentro del texto, como una palabra clave, un identificador o, en este caso, una etiqueta HTML.
-
-Los analizadores léxicos (también llamados \textbf{lexers}) detectan estos tokens a partir de expresiones regulares. Cada expresión regular define un lenguaje regular, y por tanto puede ser representada por un AFD.
+El análisis realizado incluye tareas esenciales como la limpieza y preprocesamiento de datos, análisis estadístico, exploración visual, ingeniería de características y, finalmente, la construcción y validación de distintos modelos predictivos. Además, se ha llevado a cabo una comparación entre los modelos propuestos teniendo en cuenta criterios de precisión, interpretabilidad, coste computacional e interés práctico.
 
 \medskip
 
-En esta práctica, se ha utilizado la herramienta \texttt{PLY} (Python Lex-Yacc) para construir un lexer personalizado que actúe como un autómata, escaneando el texto HTML en busca de tokens específicos como \texttt{<a href="...">} o \texttt{<img src="...">}.
+En las siguientes secciones se describen de manera detallada todas las fases del proyecto, incluyendo la descripción del conjunto de datos, la metodología seguida, los resultados obtenidos y las conclusiones derivadas del trabajo realizado.
 
-\subsection{Limitaciones del HTML como lenguaje}
+\section{Metodología y objetivos}
 
-Aunque el análisis sintáctico del HTML puede parecer sencillo a primera vista, en realidad HTML \textbf{no es un lenguaje regular}. Esto se debe a que permite estructuras anidadas, por ejemplo:
+En este proyecto se aborda un problema de aprendizaje automático en el ámbito educativo: \textbf{predecir la expectativa académica del alumnado} a partir de variables contextuales, personales y de rendimiento académico previo.
 
-\begin{verbatim}
-<div><a href="...">Texto <strong>enlace</strong></a></div>
-\end{verbatim}
-
-Reconocer correctamente este tipo de estructuras requiere una memoria adicional, como una pila, por lo que se necesita al menos un autómata a pila (AP).
-
-Sin embargo, muchas tareas prácticas (como identificar etiquetas individuales bien formadas) pueden resolverse con expresiones regulares y AFDs. Por ello, esta práctica se centra en fragmentos simples de HTML, sin anidamiento.
-
-%===== DISEÑO DEL PROYECTO ======
-\section{Diseño del proyecto}
-
-Para organizar el trabajo, el proyecto se ha dividido en varias partes. Por un lado, se ha implementado un \textit{lexer} con PLY, que actúa como un autómata para identificar patrones dentro del código HTML. Por otro lado, se ha desarrollado un parser con \texttt{BeautifulSoup}, una herramienta mucho más flexible y ampliamente utilizada en la actualidad. Finalmente, se ha añadido un sistema de comparación para analizar las diferencias entre ambos enfoques.
-
-\subsection{Estructura del proyecto}
-
-El proyecto se ha organizado en carpetas separadas para el código, los recursos de documentación y los archivos de salida:
-
+El objetivo principal es \textbf{construir un modelo predictivo que permita anticipar la expectativa académica (\texttt{esp})} de cada estudiante. Este enfoque tiene un impacto práctico relevante, ya que puede ayudar a:
 \begin{itemize}
-    \item \texttt{mi\_scraper/}: contiene todo el código Python, incluyendo el lexer, los autómatas, los scripts de test y el comparador.
-    \item \texttt{mi\_scraper/html\_tests/}: incluye los archivos de prueba HTML sobre los que se realiza la extracción.
-    \item \texttt{mi\_scraper/output/}: resultados de las extracciones realizadas tanto con BeautifulSoup como con PLY.
-    \item \texttt{memoria/}: se encuentra la memoria en \LaTeX, junto con las imágenes generadas.
+  \item Identificar estudiantes en riesgo de bajo rendimiento.
+  \item Apoyar a docentes y orientadores con herramientas de diagnóstico.
+  \item Diseñar estrategias educativas más personalizadas.
 \end{itemize}
 
-\subsection{Resumen de scripts principales}
+Para alcanzar este objetivo, se han seguido todas las etapas del ciclo completo de un proyecto de aprendizaje automático:
+\begin{enumerate}
+  \item Preparación y limpieza del conjunto de datos.
+  \item Análisis exploratorio y estadístico.
+  \item Ingeniería de atributos relevantes.
+  \item Entrenamiento y evaluación de diversos modelos de clasificación.
+  \item Aplicación de técnicas de mejora (balanceo de clases, ajuste de hiperparámetros).
+  \item Evaluación integral del modelo final (precisión, interpretabilidad y coste computacional).
+\end{enumerate}
 
-\begin{table}[h]
-\centering
-\renewcommand{\arraystretch}{1.2}
-\small
-\begin{tabular}{|l|p{11cm}|}
-\hline
-\texttt{main.py} & Script principal que ejecuta el lexer y el parser, y genera los archivos de salida. \\ \hline
-\texttt{lexer.py} & Define el lexer con PLY para reconocer etiquetas HTML específicas. \\ \hline
-\texttt{parser.py} & Implementa el parser con PLY, que utiliza el lexer para extraer etiquetas. \\ \hline
-\texttt{dom\_parser.py} & Utiliza \texttt{BeautifulSoup} para extraer las mismas etiquetas. \\ \hline
-\texttt{cross\_test.py} & Compara los resultados obtenidos por ambos métodos. \\ \hline
-\texttt{tests/test\_cases.py} & Contiene funciones de prueba automatizadas sobre los HTML de ejemplo. \\ \hline
-\end{tabular}
-\normalsize 
-\end{table}
+Esta metodología garantiza un enfoque riguroso y reproducible, permitiendo obtener conclusiones sólidas sobre la capacidad predictiva de los modelos aplicados y su utilidad en el contexto educativo.
 
-%===== WEB SCRAPING CON PLY ======
-\section{Web scraping con PLY (Lexer y Parser)}
-\subsection{Explicación de PLY y su papel en la práctica}
+% ====== DESCRIPCIÓN DEL CONJUNTO DE DATOS ======
+\section{Descripción del conjunto de datos}
 
-Para abordar el análisis léxico y sintáctico de páginas HTML se ha utilizado \texttt{PLY} (Python Lex-Yacc), una herramienta que implementa las funciones clásicas de \texttt{lex} y \texttt{yacc} dentro del lenguaje Python. Esta librería permite construir de forma declarativa un \textit{lexer} que identifique tokens a partir de expresiones regulares, así como un \textit{parser} capaz de procesar reglas sintácticas y detectar errores de estructura.
+Nuestro dataset contiene información académica, demográfica y socioeconómica de estudiantes indios de nivel preuniversitario. El objetivo principal del análisis es predecir el nivel de rendimiento académico de cada estudiante, clasificado en categorías como \textit{Good}, \textit{Average} y \textit{Poor}, a partir de sus características personales y familiares.
 
 \medskip
 
-El lexer actúa como un autómata finito determinista (AFD) que recorre carácter a carácter el contenido de un archivo HTML, identificando fragmentos que coincidan con patrones definidos. Estos patrones se expresan mediante expresiones regulares que definen tokens.
-
-\medskip
-
-Por otro lado, el parser trabaja sobre los tokens generados por el lexer y aplica reglas gramaticales para comprobar la estructura global del documento, como el anidamiento correcto de etiquetas. Esto permite detectar errores como etiquetas no cerradas o mal anidadas, los cuales no pueden ser reconocidos por un simple AFD.
-
-\medskip
-
-El uso de PLY en esta práctica permite ilustrar de forma práctica los conceptos de la asignatura, mostrando cómo los modelos teóricos como los autómatas y las gramáticas se pueden aplicar a tareas reales como el análisis de documentos HTML.
-
-\subsection{Diseño de los AFD}
-
-Para la parte léxica del proyecto se diseñaron dos autómatas finitos deterministas (AFD) que tienen como objetivo reconocer de forma precisa las etiquetas HTML más relevantes para esta práctica: los enlaces (\texttt{<a href="...">}) y las imágenes (\texttt{<img src="...">}).
-
-\medskip
-
-Ambos autómatas se construyeron a partir de las expresiones regulares definidas en el lexer y se generaron gráficamente mediante la herramienta \texttt{Graphviz}. Estas representaciones permiten visualizar cómo el lexer transita entre estados según los caracteres de entrada y en qué condiciones acepta una cadena como válida.
-
-\medskip
-
-\textbf{AFD para etiquetas de enlace (\texttt{<a href="...">}):}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{img/afd_a_tag.png}
-    \caption*{Autómata finito determinista para la etiqueta \texttt{<a href="...">}.}
-\end{figure}
-
-Este autómata comienza en un estado inicial que solo acepta el símbolo \texttt{<}. A partir de ahí, verifica carácter a carácter que la secuencia corresponda con la estructura típica de una etiqueta de enlace que contenga el atributo \texttt{href}. Si en cualquier punto se encuentra un carácter inesperado, el autómata no puede avanzar y rechaza la entrada.
-
-\medskip
-
-Cabe destacar que los estados trampa no han sido representados explícitamente en el gráfico ya que dificultan la visualización del mismo. Sin embargo, en la implementación real del lexer, estos estados son fundamentales para manejar entradas no válidas y evitar que el autómata continúe procesando cadenas incorrectas.
-
-\vspace{1em}
-
-\textbf{AFD para etiquetas de imagen (\texttt{<img src="...">}):}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{img/afd_img_tag.png}
-    \caption*{Autómata finito determinista para la etiqueta \texttt{<img src="...">}.}
-\end{figure}
-
-En este caso, el autómata valida que la cadena comience por \texttt{<img} y contenga el atributo \texttt{src}. A diferencia de la etiqueta \texttt{<a>}, no requiere una etiqueta de cierre, por lo que el autómata termina en un estado de aceptación tan pronto como se ha verificado la presencia del atributo y el cierre de la etiqueta.
-
-\medskip
-
-Estos autómatas muestran cómo los lenguajes regulares permiten capturar patrones bien definidos dentro del HTML. Sin embargo, como veremos más adelante, no son capaces de validar estructuras más complejas como el anidamiento correcto de etiquetas, lo cual justifica el uso posterior de un parser.
-
-\subsection{Implementación del \texttt{lexer.py}}
-
-El archivo \texttt{lexer.py} define el analizador léxico mediante la librería \texttt{PLY}. Este lexer está diseñado para escanear archivos HTML e identificar tokens específicos: principalmente etiquetas de enlace y de imagen.
-
-\medskip
-
-Cada token se define mediante una expresión regular asociada a una función. Cuando el texto de entrada coincide con la expresión, se genera un token correspondiente. Estos tokens son posteriormente utilizados tanto para la extracción directa como para el análisis sintáctico con el parser.
-
-\medskip
-
-A continuación se muestran las definiciones clave del lexer:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-# Token para enlaces con href
-@lex.TOKEN(r'<a\s+href\s*=\s*"[^"]*"[^>]*>')
-def t_A_TAG(t):
-    return t
-\end{minted}
-
-Este patrón reconoce etiquetas \texttt{<a>} con atributo \texttt{href}, permitiendo cierto margen de espacios y otros atributos adicionales.
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-# Token para imágenes con src
-@lex.TOKEN(r'<img\s+src\s*=\s*"[^"]*"[^>]*>')
-def t_IMG_TAG(t):
-    return t
-\end{minted}
-
-De forma análoga, este token detecta etiquetas \texttt{<img>} que incluyan el atributo \texttt{src}. No se exige un cierre explícito de la etiqueta, ya que en HTML es común que estas aparezcan como self-closing.
-
-\medskip
-
-Además de estos tokens específicos, el lexer también define reglas para detectar etiquetas de apertura y cierre genéricas:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-# Etiquetas de apertura
-@lex.TOKEN(r'<([a-zA-Z]+)(\s[^<>]*)?>')
-def t_OPEN_TAG(t):
-    t.value = t.value[1:].split()[0].lower()
-    return t
-
-# Etiquetas de cierre
-@lex.TOKEN(r'</([a-zA-Z]+)\s*>')
-def t_CLOSE_TAG(t):
-    t.value = t.value[2:-1].strip().lower()
-    return t
-\end{minted}
-
-Estas reglas permiten capturar otras etiquetas útiles para el análisis estructural, como \texttt{<body>}, \texttt{<p>}, \texttt{<div>}, etc. Su función principal es apoyar al parser en la detección de estructuras bien formadas o errores de balanceo.
-
-\medskip
-
-En conjunto, el archivo \texttt{lexer.py} actúa como un autómata que recorre el documento HTML y convierte su contenido en una secuencia de tokens, simplificando el análisis posterior.
-
-\subsection{Implementación del \texttt{parser.py}}
-
-El archivo \texttt{parser.py} define un analizador sintáctico utilizando la parte \texttt{yacc} de la librería \texttt{PLY}. Su propósito es validar la estructura general de un documento HTML, comprobando si las etiquetas están bien anidadas y correctamente balanceadas.
-
-\medskip
-
-Este parser opera sobre los tokens generados previamente por el lexer. Para ello, se definen una serie de reglas gramaticales recursivas que especifican cómo deben organizarse los elementos del HTML.
-
-\medskip
-
-A continuación se muestra un ejemplo simplificado de estas reglas:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-def p_document(p):
-    'document : elements'
-    pass
-
-def p_elements(p):
-    '''elements : element elements
-                | element'''
-    pass
-
-def p_element(p):
-    '''element : A_TAG
-               | IMG_TAG
-               | OPEN_TAG elements CLOSE_TAG'''
-    if len(p) == 4 and p[1] != p[3]:
-        print(f"Etiqueta no balanceada: <{p[1]}>...</{p[3]}>")
-\end{minted}
-
-La última regla es la más importante: permite validar que una etiqueta de apertura y su correspondiente etiqueta de cierre coincidan. Si no lo hacen, se imprime un mensaje de error indicando el desbalanceo detectado.
-
-\medskip
-
-Además, se incluye una función para capturar errores de sintaxis generales, como etiquetas mal formadas o fuera de lugar:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-def p_error(p):
-    if p:
-        print(f"Error de sintaxis en: {p.value}")
-    else:
-        print("Error de sintaxis al final del input")
-\end{minted}
-
-\medskip
-
-El parser es compilado con la siguiente instrucción:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-parser = yacc.yacc()
-\end{minted}
-
-Esta llamada genera automáticamente los archivos \texttt{parsetab.py} y \texttt{parser.out}, que contienen las tablas de análisis y los estados del autómata construido internamente.
-
-\medskip
-
-Gracias a este componente, el sistema es capaz de detectar estructuras HTML incorrectas que no podrían ser identificadas por el lexer, como etiquetas abiertas que no se cierran o anidamientos incorrectos.
-
-\subsection{Manejo de etiquetas mal formadas y estructura HTML}
-
-Uno de los principales retos de esta práctica es que el lenguaje HTML, aunque simple en apariencia, permite estructuras anidadas y una gran variedad de formas sintácticas. Esto lo convierte en un lenguaje que no es regular, por lo que no puede ser reconocido completamente por un autómata finito determinista (AFD).
-
-\medskip
-
-El \textbf{lexer} basado en expresiones regulares funciona correctamente para detectar etiquetas bien formadas de tipo \texttt{<a href="...">} y \texttt{<img src="...">}. Sin embargo, no puede validar si estas etiquetas están correctamente anidadas ni si el documento HTML está balanceado estructuralmente. Esta limitación es esperada, ya que los AFD carecen de memoria para llevar seguimiento del contexto o del número de aperturas y cierres de etiquetas.
-
-\medskip
-
-Para resolver este problema, se desarrolló un \textbf{parser sintáctico} en \texttt{parser.py}, que permite analizar la estructura jerárquica del HTML mediante reglas recursivas. Gracias a este componente, es posible detectar errores comunes como:
-
-\begin{itemize}
-    \item Etiquetas abiertas que no se cierran correctamente.
-    \item Anidamientos inválidos, como cerrar una etiqueta \texttt{<div>} con \texttt{</a>}.
-    \item Cierre de etiquetas fuera de orden.
-\end{itemize}
-
-\medskip
-
-Durante las pruebas, se comprobaron múltiples archivos HTML mal formados (ver Sección 7.4), y se observó que el parser era capaz de generar mensajes de error detallados para cada una de estas situaciones, mientras que el lexer las pasaba por alto si la etiqueta individual era sintácticamente válida.
-
-\medskip
-
-Esta combinación de lexer + parser permite simular un comportamiento similar al de un parser real de HTML, pero desde una perspectiva teórica basada en los conceptos vistos en la asignatura: \textbf{autómatas finitos} y \textbf{gramáticas independientes del contexto}.
-
-%===== WEB SCRAPING CON BEAUTIFULSOUP ======
-\section{Web scraping con BeautifulSoup (DOM)}
-\subsection{Qué es BeautifulSoup y cómo se usa}
-
-\texttt{BeautifulSoup} es una librería de Python ampliamente utilizada para realizar tareas de web scraping. A diferencia del enfoque basado en autómatas y expresiones regulares, esta herramienta trabaja a un nivel más alto, interpretando el documento HTML como una estructura jerárquica conocida como \textbf{DOM} (Document Object Model).
-
-\medskip
-
-Una vez cargado el documento, \texttt{BeautifulSoup} permite acceder a sus elementos mediante funciones como \texttt{find}, \texttt{find\_all} o búsquedas por atributos. Esto hace que sea extremadamente útil para extraer datos estructurados, incluso cuando el HTML está malformado o contiene errores.
-
-\medskip
-
-En el contexto de esta práctica, \textbf{BeautifulSoup se ha utilizado como método alternativo} al lexer+parser, con el objetivo de:
-
-\begin{itemize}
-    \item Extraer todas las etiquetas \texttt{<a>} que contengan un atributo \texttt{href}.
-    \item Extraer todas las etiquetas \texttt{<img>} con atributo \texttt{src}.
-    \item Contar la frecuencia de aparición de otras etiquetas relevantes del HTML.
-\end{itemize}
-
-\medskip
-
-Este enfoque sirve como referencia para validar los resultados del lexer y del parser, y también permite comprobar qué ventajas ofrece una librería de propósito general frente a una solución construida desde los fundamentos teóricos de los lenguajes formales.
-
-\subsection{Implementación del \texttt{dom\_parser.py}}
-
-El archivo \texttt{dom\_parser.py} implementa el análisis del documento HTML utilizando la librería\\ \texttt{BeautifulSoup}. A diferencia del lexer basado en expresiones regulares, esta herramienta convierte automáticamente el código HTML en un árbol DOM, lo que facilita enormemente la navegación por sus elementos.
-
-\medskip
-
-La implementación comienza cargando el contenido del archivo HTML y creando un objeto\\ \texttt{BeautifulSoup} que representa su estructura:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-with open(html_file, encoding='utf-8') as f:
-    html = f.read()
-
-soup = BeautifulSoup(html, 'html.parser')
-\end{minted}
-
-\medskip
-
-Una vez cargado, se realiza la extracción de enlaces e imágenes de forma muy directa, filtrando aquellas etiquetas que contengan los atributos deseados:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-# Extraer enlaces
-links = [a['href'] for a in soup.find_all('a', href=True)]
-
-# Extraer imágenes
-images = [img['src'] for img in soup.find_all('img', src=True)]
-\end{minted}
-
-\medskip
-
-Además de la extracción básica, el script cuenta el número de apariciones de otras etiquetas comunes como \texttt{<div>}, \texttt{<p>}, \texttt{<span>}, \texttt{<table>}, entre otras, y muestra un resumen por consola:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-tag_stats = {tag: len(soup.find_all(tag)) for tag in tags_to_check}
-
-for tag, count in tag_stats.items():
-    print(f"{tag}: {count}")
-\end{minted}
-
-\medskip
-
-Finalmente, los enlaces e imágenes extraídos se guardan en archivos de texto dentro de la carpeta \texttt{output/}, lo que permite comparar los resultados con los obtenidos mediante PLY:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-Path("output/links_bs.txt").write_text("\\n".join(links))
-Path("output/images_bs.txt").write_text("\\n".join(images))
-\end{minted}
-
-\medskip
-
-Este enfoque destaca por su sencillez y robustez, ya que \texttt{BeautifulSoup} es capaz de tolerar errores de sintaxis en el HTML y continuar el análisis sin interrupciones. Esto contrasta con el comportamiento más estricto del parser implementado con PLY.
-
-\subsection{Extracción de etiquetas y estadísticas}
-
-Además de identificar enlaces e imágenes, el script \texttt{dom\_parser.py} genera un pequeño análisis estadístico del documento HTML. Esto se realiza contando la cantidad de veces que aparecen determinadas etiquetas de interés en el archivo de entrada.
-
-\medskip
-
-Las etiquetas analizadas incluyen tanto las relevantes para la extracción de contenido (\texttt{<a>}, \texttt{<img>}) como otras etiquetas HTML comunes:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-tags_to_check = ["a", "img", "br", "div", "li", "ul", 
-                 "p", "span", "table", "td", "tr"]
-\end{minted}
-
-Se construye un diccionario que asocia cada etiqueta con el número de apariciones encontradas por \texttt{BeautifulSoup}:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-tag_stats = {tag: len(soup.find_all(tag)) for tag in tags_to_check}
-\end{minted}
-
-Posteriormente, el script imprime los resultados en consola, lo que permite tener una visión general del contenido HTML:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-print("\\n Estadísticas de etiquetas HTML:")
-for tag, count in tag_stats.items():
-    print(f"{tag}: {count}")
-\end{minted}
-
-\medskip
-
-Este análisis es útil para validar los archivos de prueba utilizados y observar cómo varían según el caso. También ayuda a justificar las diferencias observadas en el comportamiento de los analizadores PLY y BS4, especialmente cuando se trabaja con HTML mal formado o documentos de estructura compleja.
-
-\medskip
-
-En resumen, la inclusión de estadísticas no solo permite comprobar que el análisis se realiza correctamente, sino que también facilita la interpretación de los resultados en la comparativa entre métodos.
-
-\subsection{Ventajas y flexibilidad frente a PLY}
-
-El enfoque basado en \texttt{BeautifulSoup} presenta una serie de ventajas prácticas frente al análisis con PLY, especialmente cuando se trabaja con archivos HTML reales, que frecuentemente contienen errores de sintaxis, etiquetas mal cerradas o estructuras anidadas complejas.
-
-\medskip
-
-A diferencia del lexer y parser implementados con PLY, que requieren que el HTML tenga una estructura bien definida para poder ser analizado correctamente, \texttt{BeautifulSoup} incluye mecanismos internos de corrección y recuperación de errores. Esto le permite analizar documentos imperfectos sin generar interrupciones ni fallos de ejecución.
-
-\medskip
-
-Algunas de las principales ventajas observadas son:
-
-\begin{itemize}
-    \item \textbf{Tolerancia a errores}: es capaz de interpretar HTML mal formado, insertando automáticamente etiquetas faltantes o corrigiendo jerarquías inválidas.
-    \item \textbf{Simplicidad de uso}: permite acceder directamente a las etiquetas mediante métodos como\\ \texttt{find\_all}, sin necesidad de definir expresiones regulares ni reglas gramaticales.
-    \item \textbf{Versatilidad}: soporta búsquedas por nombre de etiqueta, atributos, clases CSS, texto contenido y más.
-\end{itemize}
-
-\medskip
-
-No obstante, estas ventajas vienen con una contrapartida: al abstraer los detalles del proceso de análisis, \texttt{BeautifulSoup} oculta el funcionamiento interno y no permite observar directamente cómo se realiza el reconocimiento de patrones, lo que puede dificultar su uso con fines educativos o de validación formal.
-
-\medskip
-
-Por el contrario, el enfoque con PLY, aunque más estricto y sensible a errores, permite comprender en profundidad cómo funcionan los analizadores léxicos y sintácticos, mostrando de forma explícita los errores encontrados y ofreciendo una experiencia más cercana a los conceptos teóricos vistos en la asignatura.
-
-\medskip
-
-Por tanto, ambos enfoques son complementarios: mientras que PLY proporciona una base sólida para comprender el funcionamiento interno del análisis de lenguajes, \texttt{BeautifulSoup} ofrece una solución eficaz para trabajar con documentos HTML en entornos reales.
-
-%===== COMPARATIVA ENTRE MÉTODOS ======
-\section{CrossTest: Comparación de resultados}
-\subsection{Explicación de \texttt{cross\_test.py}}
-
-Para validar la consistencia entre los resultados obtenidos con PLY y los obtenidos con \texttt{BeautifulSoup}, se ha implementado un script llamado \texttt{cross\_test.py}. Este componente compara los archivos de salida generados por ambos métodos, tanto para enlaces como para imágenes.
-
-\medskip
-
-La lógica del script es sencilla: abre los archivos \texttt{links\_ply.txt}, \texttt{links\_bs.txt}, \texttt{images\_ply.txt} e \texttt{images\_bs.txt}, y compara sus contenidos. Si ambas listas coinciden exactamente (sin importar el orden), se considera que el análisis ha sido consistente.
-
-\medskip
-
-A continuación se muestra un fragmento relevante del código:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-def comparar_resultados(archivo1, archivo2):
-    conjunto1 = set(Path(archivo1).read_text().splitlines())
-    conjunto2 = set(Path(archivo2).read_text().splitlines())
-    return conjunto1 == conjunto2
-\end{minted}
-
-\medskip
-
-Posteriormente, se llama a esta función para comparar los enlaces y las imágenes extraídos por ambos métodos:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-links_ok = comparar_resultados("output/links_ply.txt", "output/links_bs.txt")
-imgs_ok = comparar_resultados("output/images_ply.txt", "output/images_bs.txt")
-\end{minted}
-
-En función del resultado, el script muestra un mensaje indicando si hay coincidencia o no:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-if links_ok:
-    print("Enlaces coinciden")
-else:
-    print("DIFERENCIA en enlaces")
-\end{minted}
-
-\medskip
-
-Este comparador resulta especialmente útil para evaluar la fiabilidad del lexer y parser implementados con PLY. Si ambos métodos coinciden en todos los casos, se puede concluir que el reconocimiento realizado por los autómatas es correcto, al menos en lo que respecta a las etiquetas objetivo de esta práctica.
-
-\subsection{Validación cruzada entre PLY y BS4}
-
-Tras la implementación de ambos analizadores y el desarrollo del script de comparación, se procedió a validar su comportamiento mediante múltiples archivos de prueba. En todos los casos se analizó la extracción de enlaces e imágenes, contrastando los resultados obtenidos por PLY (lexer + parser) y por \texttt{BeautifulSoup}.
-
-\medskip
-
-La validación cruzada reveló un comportamiento muy positivo: en todos los archivos de prueba, los resultados fueron coincidentes. Esto sugiere que, a pesar de sus limitaciones estructurales, el lexer y parser diseñados con PLY fueron capaces de identificar correctamente las etiquetas HTML objetivo y extraer la misma información que un analizador de propósito general como \texttt{BeautifulSoup}.
-
-\medskip
-
-Además, se observó que incluso en documentos HTML mal formados (con etiquetas sin cerrar, estructuras desordenadas o jerarquías incorrectas) ambos métodos lograron recuperar la misma información. Esto refuerza la idea de que el reconocimiento de patrones individuales, como las etiquetas \texttt{<a href="...">} o \texttt{<img src="...">}, puede abordarse con éxito utilizando técnicas formales basadas en autómatas finitos.
-
-\medskip
-
-No obstante, también se evidenció que el parser implementado con PLY resulta más estricto y menos tolerante a errores, ya que emite advertencias cuando las etiquetas están mal balanceadas. En cambio, \texttt{BeautifulSoup} ignora esos problemas y continúa el análisis normalmente, lo cual puede ser útil en entornos productivos pero menos formativo desde un punto de vista académico.
-
-\medskip
-
-En definitiva, esta validación cruzada permite confiar en la efectividad del sistema desarrollado y demuestra que los modelos teóricos aplicados en este proyecto tienen un alcance práctico significativo.
-
-\subsection{Comentarios sobre resultados consistentes}
-
-El análisis de los archivos de prueba reveló una alta consistencia entre los resultados obtenidos por los dos métodos implementados: el lexer y parser construidos con PLY, y el analizador de DOM basado en \texttt{BeautifulSoup}. A continuación se destacan algunas observaciones relevantes que permiten interpretar mejor estos resultados:
-
-\begin{itemize}
-    \item En todos los casos, tanto PLY como BeautifulSoup identificaron el mismo número de enlaces e imágenes, incluso en documentos mal estructurados. Esto refuerza la fiabilidad del enfoque basado en autómatas para reconocer patrones léxicos específicos.
-
-    \item En archivos como \texttt{prueba3.html} y \texttt{prueba6.html}, que presentan etiquetas mal cerradas, anidamientos incorrectos o errores de sintaxis, el parser detectó múltiples errores, pero aún así se logró extraer correctamente la información deseada.
-
-    \item El sistema de comparación no sólo valida la coincidencia de los datos, sino que también actúa como una verificación cruzada: si un método produce un resultado diferente, el error puede detectarse rápidamente revisando ambos archivos de salida.
-
-    \item En el caso del lexer con PLY, el número de enlaces e imágenes coincide siempre que las etiquetas estén correctamente formadas en su versión básica. En cambio, BeautifulSoup puede extraer información útil incluso de etiquetas incompletas, lo cual puede considerarse tanto una ventaja como una fuente potencial de ruido.
-
-    \item La ejecución repetida del script \texttt{run\_all.sh} sobre cada archivo de prueba mostró que el comportamiento era estable, consistente y predecible, lo que demuestra que el sistema es robusto ante entradas diversas.
-\end{itemize}
-
-Estas observaciones confirman que el diseño del sistema ha sido eficaz a la hora de combinar la precisión del análisis léxico con la flexibilidad del análisis estructural, ofreciendo una herramienta sólida para tareas de extracción de información en HTML.
-
-\subsection{Tabla de cobertura de pruebas (PLY vs BS4)}
-
-A continuación se muestra la tabla revisada que resume el comportamiento de ambos métodos para distintos archivos HTML:
+El conjunto de datos cuenta con \textbf{131 instancias} y \textbf{22 atributos}, todos ellos de tipo categórico. A continuación, se analiza brevemente cada una de las variables:
 
 \begin{table}[H]
-\renewcommand{\arraystretch}{1.3}
-\small
-\begin{tabularx}{\textwidth}{|l|c|c|>{\raggedright\arraybackslash}X|c|c|c|c|}
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{1.1}
+\begin{tabularx}{\textwidth}{|l|X|X|}
 \hline
-\textbf{Archivo} & \textbf{Enl. PLY} & \textbf{Img. PLY} & \textbf{Balanceo HTML (parser)} & \textbf{Enl. BS4} & \textbf{Img. BS4} & \textbf{Links} & \textbf{Imgs} \\
+\textbf{Var.} & \textbf{Descripción} & \textbf{Influencia en \texttt{atd}} \\
 \hline
-\texttt{prueba1.html} & 0 & 0 & Error de sintaxis (falta apertura) & 0 & 0 & \cmark & \cmark \\
-\texttt{prueba2.html} & 1 & 1 & \texttt{<br>} mal cerrado dentro de \texttt{<a>} & 1 & 1 & \cmark & \cmark \\
-\texttt{prueba3.html} & 2 & 1 & Varias etiquetas no balanceadas (\texttt{<area>}) & 2 & 1 & \cmark & \cmark \\
-\texttt{prueba4.html} & 1 & 1 & \texttt{<p>} y \texttt{<body>} sin cierre correcto & 1 & 1 & \cmark & \cmark \\
-\texttt{prueba5.html} & 1 & 1 & \texttt{<a>} mal anidado dentro de \texttt{<p>} & 1 & 1 & \cmark & \cmark \\
-\texttt{prueba6.html} & 48 & 14 & Múltiples errores de anidamiento y sintaxis & 48 & 14 & \cmark & \cmark \\
+\texttt{ge} & Género (M/F) & Diferencias culturales/contextuales \\
+\texttt{cst} & Casta/grupo social & Relación con nivel socioeconómico \\
+\texttt{tnp} & Nota 1er parcial & Indicador de rendimiento \\
+\texttt{twp} & Nota 2º parcial & Refuerza patrón de rendimiento \\
+\texttt{iap} & Evaluación interna & Influencia directa en resultado \\
+\texttt{esp} & Participación/exposición & Evalúa habilidades comunicativas \\
+\texttt{arr} & ¿Alojamiento? (Y/N) & Afecta entorno y tiempo de estudio \\
+\texttt{ms} & Estado civil & Poco relevante (mayoría solteros) \\
+\texttt{ls} & Medio transporte (T/V) & Influye en cansancio/dedicación \\
+\texttt{as} & Tipo admisión & Refleja situación económica \\
+\texttt{fmi} & Ingreso familiar & Recursos académicos disponibles \\
+\texttt{fs} & Tamaño familia & Carga y apoyo familiar \\
+\texttt{fq} & Educación padre & Entorno educativo en casa \\
+\texttt{mq} & Educación madre & Igual de relevante que paterna \\
+\texttt{fo} & Ocupación padre & Nivel económico indirecto \\
+\texttt{mo} & Ocupación madre & Complementa perfil socioeconómico \\
+\texttt{nf} & Nº miembros familia & Recursos/atención diluidos \\
+\texttt{sh} & Salud general & Relacionado con rendimiento \\
+\texttt{ss} & Tipo escuela previa & Nivel de preparación previa \\
+\texttt{me} & Idioma instrucción & Comprensión si no es nativo \\
+\texttt{tt} & Tiempo transporte & Menos tiempo de estudio \\
+\texttt{atd} & \textit{Objetivo}: rendimiento final & Etiqueta a predecir \\
 \hline
 \end{tabularx}
-\caption*{Resultados de la comparación entre PLY y BeautifulSoup.}
+\caption*{Descripción resumida de las variables}
 \end{table}
 
 \medskip
 
-Como puede observarse, todos los archivos presentan problemas de estructura HTML que son detectados por el parser con PLY. Sin embargo, tanto el lexer como el analizador con \texttt{BeautifulSoup} son capaces de extraer correctamente los enlaces e imágenes previstos. Las comprobaciones cruzadas confirman la coincidencia de resultados, validando la consistencia entre ambos enfoques.
+Seguidmente, se muestra un extracto de las primeras cinco filas del conjunto de datos:
 
-%===== PRUEBAS DE EJECUCIÓN Y RESULTADOS ======
-\section{Pruebas de ejecución y resultados}
+\begin{minted}[fontsize=\small, bgcolor=codegray]{python}
+from scipy.io import arff
+import pandas as pd
 
-En esta sección se muestran los resultados prácticos obtenidos al ejecutar el sistema completo sobre distintos archivos HTML de prueba. Para facilitar la ejecución, se desarrolló un script llamado \texttt{run\_all.sh} que automatiza el análisis completo con PLY, BeautifulSoup y la comparación cruzada.
+# Cargar el archivo ARFF
+data, meta = arff.loadarff('Sapfile1.arff')
+df = pd.DataFrame(data)
 
-\subsection{Ejecución del sistema completo}
+# Mostrar las primeras filas del dataset para revisión inicial
+df.head()
+\end{minted}
 
-A continuación se muestra un ejemplo de ejecución del script sobre el archivo \texttt{prueba3.html}, el cual contiene varias etiquetas mal balanceadas:
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lllllllllll}
+\textbf{ge} & \textbf{cst} & \textbf{tnp} & \textbf{twp} & \textbf{iap} & \textbf{esp} & \textbf{arr} & \textbf{ms} & \textbf{ls} & \textbf{as} & \textbf{...} \\
+F & G & Good & Good & Vg & Good & Y & Unmarried & V & Paid & ... \\
+M & OBC & Vg & Vg & Vg & Vg & N & Unmarried & V & Paid & ... \\
+F & OBC & Good & Good & Vg & Good & N & Unmarried & V & Paid & ... \\
+M & MOBC & Pass & Good & Vg & Good & N & Unmarried & V & Paid & ... \\
+M & G & Good & Good & Vg & Vg & N & Unmarried & V & Paid & ... \\
+\end{tabular}
+\caption*{Primeras filas del conjunto de datos}
+\end{table}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{img/ejecucion_prueba3.png}
-    \caption*{Ejecución del script \texttt{run\_all.sh} sobre \texttt{prueba3.html}.}
-\end{figure}
+\medskip
 
-Como puede observarse, el parser detecta varios errores de sintaxis y etiquetas mal cerradas. A pesar de ello, tanto el lexer como BeautifulSoup logran extraer correctamente los enlaces e imágenes del documento.
+Este conjunto de datos permite explorar cómo distintas dimensiones personales y familiares pueden influir en el rendimiento escolar, ofreciendo una oportunidad interesante para aplicar técnicas de aprendizaje automático supervisado.
 
-\subsection{Archivos de salida generados}
+\section{Preprocesamiento de datos}
 
-El sistema crea automáticamente archivos de texto en la carpeta \texttt{output/}, donde se almacenan los resultados de la extracción realizada por ambos métodos. Por ejemplo:
+El preprocesamiento es una etapa clave en todo flujo de trabajo de aprendizaje automático. En este proyecto, se han realizado varias operaciones fundamentales antes de entrenar los modelos. A continuación, se detallan los pasos realizados:
+
+\subsection{Conversión de valores byte a string}
+
+El conjunto de datos, al estar en formato \texttt{.arff}, contenía sus valores almacenados como secuencias de bytes (e.g., \texttt{b'Good'}). Para poder analizarlos con herramientas como \texttt{pandas}, se realizó una conversión de todos estos valores a cadenas de texto (\texttt{str}) mediante una transformación a nivel de celda.
+
+\medskip
+
+\subsection{Verificación de valores nulos}
+
+Se comprobó si alguna de las 22 columnas contenía valores nulos. La inspección mostró que \textbf{no hay valores faltantes} en ninguna de las variables, lo cual facilitó el flujo de trabajo al no ser necesaria ninguna imputación ni eliminación de observaciones.
+
+\begin{minted}[bgcolor=codegray]{text}
+Valores nulos por columna:
+ge     0
+cst    0
+...
+atd    0
+\end{minted}
+
+\medskip
+
+\subsection{Clasificación de variables por tipo}
+
+Se identificaron las variables categóricas y numéricas mediante la inspección del tipo de dato de cada columna:
 
 \begin{itemize}
-    \item \texttt{output/links\_ply.txt} — enlaces encontrados con el lexer.
-    \item \texttt{output/images\_bs.txt} — imágenes encontradas con BeautifulSoup.
+  \item Todas las variables del conjunto fueron clasificadas como categóricas (\texttt{object}).
+  \item No se identificaron variables numéricas.
 \end{itemize}
-
-A continuación se muestra el contenido de uno de estos archivos para el caso de prueba anterior:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{text}
-http://www.bbc.co.uk
-http://www.ibm.com
-\end{minted}
-
-Estos resultados confirman que la extracción es funcional incluso cuando el documento HTML contiene errores estructurales.
-
-\subsection{Comprobación cruzada de resultados}
-
-Como se ha explicado en la sección anterior, el script \texttt{cross\_test.py} compara los archivos de salida y verifica si ambos métodos producen resultados coincidentes.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{img/cross_test_ok.png}
-    \caption*{Verificación cruzada de resultados con \texttt{cross\_test.py}.}
-\end{figure}
-
-En todos los casos de prueba, se observó una coincidencia perfecta entre los enlaces e imágenes extraídos por PLY y los obtenidos por \texttt{BeautifulSoup}. Esto valida la efectividad del enfoque basado en autómatas finitos y gramáticas simplificadas para tareas prácticas de web scraping.
-
-\subsection{Detección de errores sintácticos}
-
-Uno de los aspectos más relevantes del parser implementado con PLY es su capacidad para identificar errores estructurales en el HTML, como etiquetas mal cerradas, anidamientos incorrectos o cierres fuera de lugar. A continuación se muestra un ejemplo real:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{img/errores_parser.png}
-    \caption*{Mensajes de error generados por el parser ante etiquetas no balanceadas.}
-\end{figure}
-
-Estos mensajes son útiles tanto para validar la calidad del documento HTML como para ilustrar cómo un analizador sintáctico puede utilizar reglas formales para detectar errores.
-
-\subsection{Tests unitarios}
-
-Para validar el funcionamiento interno del lexer y del sistema de análisis desarrollado, se implementó un archivo de pruebas automáticas en \texttt{Python} utilizando la librería estándar \texttt{unittest}. Estas pruebas están definidas en el archivo:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{text}
-mi_scraper/tests/test_cases.py
-\end{minted}
 
 \medskip
 
-El objetivo principal de los tests es asegurar que:
+\subsection{Análisis descriptivo de variables categóricas}
+
+Se utilizaron las funciones estadísticas de \texttt{pandas} para obtener una visión general de cada variable categórica. Para cada una se reportaron:
 
 \begin{itemize}
-    \item Las etiquetas \texttt{<a href="...">} y \texttt{<img src="...">} se reconocen correctamente como tokens por parte del lexer.
-    \item La función principal \texttt{analyze\_html} extrae correctamente enlaces e imágenes desde un documento HTML.
-    \item No se detectan enlaces inexistentes en documentos vacíos o sin etiquetas \texttt{<a>}.
+  \item \textbf{count}: número total de observaciones.
+  \item \textbf{unique}: número de valores únicos presentes.
+  \item \textbf{top}: valor más frecuente.
+  \item \textbf{freq}: frecuencia de ese valor más frecuente.
 \end{itemize}
 
-A continuación se muestra un extracto relevante del archivo de pruebas, con ejemplos de validación de tokens:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-def test_detect_single_a_tag(self):
-    html = '<a href="https://example.com">Link</a>'
-    lexer.input(html)
-    tokens = [tok for tok in lexer if tok.type == 'A_TAG']
-    self.assertEqual(len(tokens), 1)
-    self.assertEqual(tokens[0].value, 'https://example.com')
-\end{minted}
-
-Esta prueba asegura que se detecta correctamente un único enlace en el documento, y que el valor del token corresponde exactamente con la URL contenida en el atributo \texttt{href}.
-
-\medskip
-
-Además, se incluye una prueba para la extracción conjunta de enlaces e imágenes usando la función principal del sistema:
-
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{python}
-def test_extract_links_and_images(self):
-    html = '''
-    <a href="http://link.com">Test</a>
-    <img src="image.jpg">
-    '''
-    with tempfile.NamedTemporaryFile(mode="w+", suffix=".html") as f:
-        f.write(html)
-        f.flush()
-        links, images = analyze_html(f.name)
-
-    self.assertEqual(links[0], 'http://link.com')
-    self.assertEqual(images[0], 'image.jpg')
+\begin{minted}[bgcolor=codegray]{text}
+Estadísticas para variables categóricas:
+ge:     2 categorías (M, F), valor más común: M (72 casos)
+cst:    5 categorías, top: OBC (57 casos)
+...
+atd:    3 categorías (Good, Average, Poor), top: Good (56 casos)
 \end{minted}
 
 \medskip
 
-Esta prueba permite comprobar que el flujo completo de análisis (lexer + parser) se ejecuta correctamente sobre un documento HTML creado de forma temporal, sin necesidad de guardar archivos permanentes.
+Este análisis exploratorio inicial reveló que todas las variables son de tipo cualitativo, lo cual condiciona el enfoque de modelado y codificación posterior. La ausencia de variables numéricas implica que no fue necesario aplicar técnicas como la normalización o estandarización.
 
 \medskip
 
-\textbf{Resultado de ejecución:} Todos los tests pasaron satisfactoriamente, lo que demuestra que el sistema de extracción está funcionando como se espera:
+Con esto finaliza la etapa de preprocesamiento básica. Los datos ya están listos para su exploración gráfica y modelado supervisado.
 
-\begin{minted}[fontsize=\small, breaklines, bgcolor=codegray]{text}
-....
-----------------------------------------------------------------------
-Ran 4 tests in 0.004s
+\subsection{Visualización de frecuencias de variables categóricas}
 
-OK
+Para explorar la distribución de las variables categóricas presentes en el conjunto de datos, se han generado diagramas de barras para un subconjunto representativo de columnas: \texttt{ge}, \texttt{cst}, \texttt{tnp}, \texttt{esp}, \texttt{arr}, \texttt{as}, \texttt{nf} y \texttt{atd}.
+
+\medskip
+
+Cada gráfico muestra la frecuencia de aparición de cada categoría en la variable correspondiente. Esta visualización resulta útil para identificar desequilibrios en la representación de clases, categorías dominantes o valores con muy baja frecuencia que podrían afectar negativamente al rendimiento de los modelos predictivos.
+
+\medskip
+
+A continuación, se presentan los diagramas de barras generados:
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}{0.32\textwidth}
+    \includegraphics[width=\linewidth]{img/frecuencia_ge.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.32\textwidth}
+    \includegraphics[width=\linewidth]{img/frecuencia_cst.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.32\textwidth}
+    \includegraphics[width=\linewidth]{img/frecuencia_tnp.png}
+  \end{minipage}
+
+  \medskip
+
+  \begin{minipage}{0.32\textwidth}
+    \includegraphics[width=\linewidth]{img/frecuencia_esp.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.32\textwidth}
+    \includegraphics[width=\linewidth]{img/frecuencia_arr.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.32\textwidth}
+    \includegraphics[width=\linewidth]{img/frecuencia_as.png}
+  \end{minipage}
+
+  \medskip
+
+  \begin{minipage}{0.32\textwidth}
+    \includegraphics[width=\linewidth]{img/frecuencia_nf.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.32\textwidth}
+    \includegraphics[width=\linewidth]{img/frecuencia_atd.png}
+  \end{minipage}
+
+  \caption*{Distribución de frecuencias en variables categóricas seleccionadas}
+\end{figure}
+
+\textbf{Observaciones destacadas del análisis visual:}
+
+\begin{itemize}
+    \item \texttt{ge}: distribución equilibrada con leve predominio masculino.
+    \item \texttt{cst}: diversidad de casta, aunque con algunas categorías muy poco frecuentes.
+    \item \texttt{tnp} y \texttt{twp}: predominio de calificaciones \texttt{Good} y \texttt{Vg}; pocas de tipo \texttt{Pass}.
+    \item \texttt{esp}: alta concentración en valoraciones \texttt{Good} y \texttt{Vg}.
+    \item \texttt{arr}: mayoría de estudiantes sin asistencia regular (\texttt{N}).
+    \item \texttt{as}: casi todos los estudiantes han pagado sus tasas (\texttt{Paid}).
+    \item \texttt{nf}: las familias grandes y medias son más comunes.
+    \item \texttt{atd}: predominan las categorías \texttt{Good} y \texttt{Average}.
+\end{itemize}
+
+\medskip
+
+Este análisis reveló que algunas variables tienen distribuciones muy desbalanceadas (\texttt{as}, \texttt{arr}) y por tanto podrían aportar poca información útil a los modelos, mientras que otras (\texttt{cst}, \texttt{tnp}, \texttt{nf}) muestran mayor diversidad y potencial predictivo.
+
+\subsection{Limpieza final de variables categóricas}
+
+Tras la exploración inicial y la visualización de frecuencias, se aplicaron varias transformaciones importantes al conjunto de datos para optimizar su uso en modelos de aprendizaje automático:
+
+\subsubsection*{1. Agrupación de categorías poco frecuentes en \texttt{cst}}
+
+La variable \texttt{cst} (casta) contenía categorías con muy baja representación, lo que puede ser problemático por:
+
+\begin{itemize}
+    \item Riesgo de sobreajuste en modelos supervisados.
+    \item Problemas de codificación (especialmente al aplicar one-hot encoding).
+    \item Baja estabilidad durante la validación cruzada.
+\end{itemize}
+
+Por ello, se agruparon todas las categorías con menos de 10 ocurrencias en una nueva categoría común: \texttt{Other}. Las categorías conservadas fueron:
+
+\begin{minted}[bgcolor=codegray]{text}
+['G', 'OBC', 'ST', 'Other']
 \end{minted}
 
+\subsubsection*{2. Eliminación de la variable \texttt{ge} (género)}
+
+Aunque \texttt{ge} (género) está bien distribuida entre \texttt{M} y \texttt{F}, el análisis estadístico indicó que no guarda relación significativa con la variable objetivo. Por tanto, se decidió eliminarla para:
+
+\begin{itemize}
+    \item Evitar complejidad innecesaria.
+    \item Reducir ruido informativo.
+    \item Mejorar la generalización del modelo.
+\end{itemize}
+
+\subsubsection*{3. Eliminación de columnas sin variabilidad}
+
+Las variables constantes (mismo valor en todas las filas) no aportan valor al modelo. En este conjunto, se identificó la columna:
+
+\begin{minted}[bgcolor=codegray]{text}
+Columnas eliminadas por no tener variabilidad:
+['ms']
+\end{minted}
+
+La cual fue eliminada del conjunto final por no contener información discriminativa.
+
 \medskip
 
-Este sistema de pruebas contribuye a mantener la fiabilidad del proyecto y garantiza que las funciones clave se comportan correctamente, incluso si en el futuro se realizan modificaciones o mejoras en el código base.
+Estas operaciones representan una etapa crítica del preprocesamiento: asegurar que cada variable aporte valor real al modelo y que el espacio de características sea lo más relevante y compacto posible.
 
+\subsection{Codificación de variables categóricas}
 
-%===== CONCLUSIONES ======
-\section{Conclusiones}
-
-Este proyecto ha servido para poner en práctica conceptos de autómatas y gramáticas aplicados al análisis de HTML. Se ha comprobado que, aunque las herramientas teóricas como PLY funcionan bien para tareas concretas, soluciones como BeautifulSoup son más flexibles y robustas para HTML real. La comparación y las pruebas han mostrado que ambos métodos pueden ser fiables para extraer información sencilla.
+Tras haber realizado la limpieza y transformación de las variables categóricas, se procedió a codificarlas numéricamente para su uso en modelos de aprendizaje automático. Para ello se empleó la clase \texttt{LabelEncoder} de \texttt{scikit-learn}, la cual asigna a cada categoría un número entero distinto.
 
 \medskip
 
-Sin embargo, el enfoque basado en autómatas y gramáticas permite comprender en profundidad los límites de los lenguajes regulares y el papel de los analizadores léxicos y sintácticos. Se ha evidenciado que, aunque los AFD son útiles para reconocer patrones simples, no pueden validar la estructura completa de HTML debido a su naturaleza no regular. El uso de un parser con reglas recursivas ha permitido detectar errores de anidamiento y balanceo, reforzando la importancia de las gramáticas independientes del contexto en el análisis de lenguajes más complejos.
+\subsubsection*{Variables codificadas}
+
+Todas las columnas del dataset eran categóricas, incluyendo:
+
+\begin{itemize}
+    \item \texttt{esp}: especialidad del alumno (variable objetivo).
+    \item \texttt{cst}, \texttt{tnp}, \texttt{twp}: contexto académico.
+    \item \texttt{arr}, \texttt{ls}, \texttt{as}, \texttt{fmi}, \texttt{fs}: características escolares.
+    \item \texttt{sh}, \texttt{ss}, \texttt{me}, \texttt{tt}, \texttt{atd}: hábitos, salud y rendimiento.
+\end{itemize}
+
+Cada una fue transformada a enteros, manteniendo una correspondencia uno-a-uno con las categorías originales. Esta codificación no impone orden alguno entre los valores.
 
 \medskip
 
-Por otro lado, BeautifulSoup ha demostrado ser una herramienta muy eficaz y tolerante a errores, lo que la hace idónea para aplicaciones prácticas de scraping en entornos reales. Su facilidad de uso y capacidad para manejar HTML mal formado justifican su popularidad en la industria.
+\subsubsection*{Justificación del uso de \texttt{LabelEncoder}}
+
+En este proyecto se entrenaron diversos modelos como árboles de decisión, k-vecinos más cercanos, Naive Bayes, regresión logística y redes neuronales multicapa (MLP). Todos estos modelos requieren entradas numéricas, ya que operan sobre distancias, probabilidades o productos escalares.
+
+\begin{itemize}
+    \item El modelo final —una Red Neuronal Multicapa— exige obligatoriamente entradas numéricas para poder entrenarse.
+    \item Se optó por \texttt{LabelEncoder} en lugar de \texttt{OneHotEncoder} para evitar la explosión de columnas, ya que muchas variables tienen múltiples categorías. Esto mantiene el conjunto de datos compacto y manejable.
+    \item Como los modelos empleados no asumen orden entre los valores, la codificación entera no introduce sesgos significativos.
+\end{itemize}
 
 \medskip
 
-En resumen, la experiencia ha sido útil para entender mejor cómo se conectan la teoría y la práctica en el análisis de lenguajes. El trabajo realizado ha permitido valorar tanto la potencia de los modelos formales como la necesidad de herramientas prácticas en el desarrollo de soluciones reales, y ha reforzado la importancia de una formación sólida en los fundamentos teóricos de la asignatura.
+\subsubsection*{Resumen del enfoque}
 
-\vspace{1em}
+\begin{itemize}
+    \item Las variables eran todas categóricas y no ordinales.
+    \item \texttt{LabelEncoder} permitió mantener una representación eficiente del dataset.
+    \item Se garantizó la compatibilidad con modelos como MLP, que requieren entradas puramente numéricas.
+\end{itemize}
 
-%===== BIBLIOGRAFÍA ======
+\medskip
+
+\subsubsection*{Ejemplo del dataset tras la codificación}
+
+A continuación, se muestra un extracto del conjunto de datos una vez codificado:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{cccccccccc}
+\toprule
+\texttt{cst} & \texttt{tnp} & \texttt{twp} & \texttt{iap} & \texttt{esp} & \texttt{arr} & \texttt{as} & \texttt{nf} & \texttt{me} & \texttt{atd} \\
+\midrule
+0 & 1 & 1 & 3 & 1 & 1 & 1 & 1 & 0 & 1 \\
+1 & 3 & 3 & 3 & 3 & 0 & 1 & 2 & 0 & 0 \\
+1 & 1 & 1 & 3 & 1 & 0 & 1 & 0 & 0 & 1 \\
+2 & 2 & 1 & 3 & 1 & 0 & 1 & 1 & 0 & 0 \\
+0 & 1 & 1 & 3 & 3 & 0 & 1 & 1 & 0 & 1 \\
+\bottomrule
+\end{tabular}
+\caption*{Muestra de registros tras aplicar LabelEncoder a las variables categóricas}
+\end{table}
+
+\medskip
+
+Este paso fue esencial para adaptar el conjunto de datos al formato requerido por los clasificadores utilizados, en especial la red neuronal multicapa entrenada posteriormente.
+
+\section{Análisis estadístico de las variables}
+
+En esta sección se analizan las dependencias estadísticas entre las variables categóricas del conjunto de datos, con el objetivo de identificar qué atributos están más fuertemente asociados a la variable objetivo \texttt{esp} (especialidad del alumno), así como detectar posibles redundancias entre variables.
+
+\subsection{Dependencia entre variables y la clase objetivo}
+
+Se realizó un análisis bivariado entre cada variable independiente y la variable objetivo \texttt{esp} utilizando el test Chi-cuadrado de independencia. Adicionalmente, se calculó el coeficiente de asociación \textbf{Cramér’s V}, que cuantifica la fuerza de relación entre dos variables categóricas (valor entre 0 y 1).
+
+\medskip
+
+Para cada variable del dataset (excluyendo \texttt{esp}), se calcularon:
+
+\begin{itemize}
+    \item Estadístico \textbf{Chi-cuadrado} y su \textbf{p-valor}, para evaluar independencia.
+    \item Coeficiente \textbf{Cramér’s V}, como medida de intensidad de asociación.
+\end{itemize}
+
+\medskip
+
+Los resultados se ordenaron en función del valor del estadístico Chi-cuadrado. En la siguiente tabla se presentan las variables más relevantes:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lccc}
+\toprule
+\textbf{Variable} & \textbf{Chi2} & \textbf{p-value} & \textbf{Cramér's V} \\
+\midrule
+iap   & 100.44 & $1.28\times10^{-17}$ & 0.505 \\
+twp   & 81.26  & $9.09\times10^{-14}$ & 0.455 \\
+tnp   & 80.07  & $1.56\times10^{-13}$ & 0.451 \\
+arr   & 23.24  & $3.59\times10^{-5}$  & 0.421 \\
+as    & 22.28  & $5.70\times10^{-5}$  & 0.412 \\
+atd   & 30.60  & $3.03\times10^{-5}$  & 0.342 \\
+sh    & 25.25  & $3.06\times10^{-4}$  & 0.310 \\
+me    & 29.28  & $5.82\times10^{-4}$  & 0.273 \\
+nf    & 20.08  & $2.68\times10^{-3}$  & 0.277 \\
+\bottomrule
+\end{tabular}
+\caption*{Resultados del test Chi-cuadrado y Cramér's V respecto a la variable \texttt{esp}}
+\end{table}
+
+\medskip
+
+Estas métricas sugieren que variables como \texttt{iap} (nota de evaluación interna), \texttt{twp}/\texttt{tnp} (notas previas), y aspectos como \texttt{arr} (asistencia regular) o \texttt{as} (estado de pagos) tienen una fuerte asociación con la especialidad académica elegida.
+
+\subsection{Matriz de Cramér's V entre variables}
+
+Además del análisis individual, se construyó una \textbf{matriz de Cramér’s V} entre todas las variables categóricas para identificar relaciones internas y posibles redundancias. Esta matriz es simétrica y presenta valores entre 0 (sin relación) y 1 (correlación perfecta).
+
+\medskip
+
+La matriz completa se visualiza mediante un mapa de calor:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{img/matriz_cramers_v.png}
+\caption*{Matriz de Cramér's V entre variables categóricas}
+\end{figure}
+
+\medskip
+
+El mapa de calor permite identificar clústeres de variables altamente asociadas entre sí. Este tipo de análisis es útil para seleccionar subconjuntos no redundantes de variables para modelos más simples o interpretables.
+
+\medskip
+
+En resumen, este análisis estadístico ayudó a:
+
+\begin{itemize}
+    \item Identificar variables predictivamente fuertes respecto a \texttt{esp}.
+    \item Detectar agrupaciones internas de variables redundantes.
+    \item Priorizar atributos relevantes para el modelado.
+\end{itemize}
+
+\subsection{Evaluación de variables predictoras mediante Información Mutua}
+
+Con el objetivo de identificar las variables más relevantes para predecir la expectativa académica (\texttt{esp}), se calculó la \textbf{información mutua} entre cada variable del conjunto de datos y la variable objetivo.
+
+\medskip
+
+La información mutua es una medida que indica cuánta información comparte una variable con otra, sin asumir relaciones lineales ni distribuciones específicas. Cuanto mayor sea su valor, mayor será la dependencia estadística entre las variables.
+
+\medskip
+
+Para ello, todas las variables categóricas fueron codificadas mediante \texttt{LabelEncoder} y se utilizó la función \texttt{mutual\_info\_classif} de \texttt{scikit-learn}.
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lc}
+\toprule
+\textbf{Variable} & \textbf{Información Mutua} \\
+\midrule
+\texttt{tnp} & 0.322 \\
+\texttt{twp} & 0.263 \\
+\texttt{iap} & 0.237 \\
+\texttt{atd} & 0.131 \\
+\texttt{me}  & 0.129 \\
+\texttt{sh}  & 0.120 \\
+\texttt{fq}  & 0.109 \\
+\texttt{arr} & 0.100 \\
+\texttt{as}  & 0.090 \\
+\texttt{nf}  & 0.082 \\
+\bottomrule
+\end{tabular}
+\caption*{Variables más informativas respecto a \texttt{esp} según información mutua}
+\end{table}
+
+\medskip
+
+\subsubsection*{Análisis de resultados}
+
+\begin{itemize}
+    \item \textbf{Variables altamente informativas:} \texttt{tnp}, \texttt{twp} y \texttt{iap} tienen los valores más altos, lo que sugiere una fuerte relación con la especialidad académica esperada. Esto es consistente con la lógica del problema, ya que el rendimiento académico previo y el interés en actividades prácticas influyen en las expectativas educativas.
+    
+    \item \textbf{Variables moderadamente informativas:} variables como \texttt{atd}, \texttt{me}, \texttt{sh}, \texttt{fq} o \texttt{arr} podrían complementar el modelo al aportar señales adicionales, aunque de forma más sutil.
+    
+    \item \textbf{Variables poco informativas:} \texttt{ge} (género), \texttt{mo} (ocupación materna), \texttt{ls}, \texttt{ss} y similares presentan valores muy bajos (< 0.05), por lo que es razonable descartarlas en fases posteriores del modelado para evitar ruido y sobreajuste.
+\end{itemize}
+
+\medskip
+
+\subsubsection*{Conclusión}
+
+La información mutua permitió establecer un ranking objetivo de las variables más relevantes. Esta métrica fue especialmente útil para guiar la selección de atributos y reducir la dimensionalidad antes del entrenamiento de modelos complejos, como la red neuronal multicapa.
+
+\section{Entrenamiento y Evaluación de Modelos Predictivos}
+
+En esta sección se lleva a cabo el proceso completo de entrenamiento y evaluación de cinco modelos clásicos de clasificación supervisada, cuyo objetivo es predecir la variable \texttt{esp} (expectativa académica del estudiante). El procedimiento incluye la preparación de los datos, la definición de modelos base y la comparación de resultados mediante métricas estándar.
+
+\medskip
+
+\noindent\textbf{Preparación de los datos:}
+\begin{itemize}
+    \item Todas las variables categóricas fueron transformadas a formato numérico mediante \texttt{LabelEncoder}, permitiendo su uso por parte de los algoritmos de aprendizaje automático.
+    \item Se definieron las variables predictoras (\texttt{X}) y la variable objetivo (\texttt{y = esp}).
+    \item Se aplicó una partición estratificada de los datos:
+    \begin{itemize}
+        \item 70\% de los registros se utilizaron para entrenamiento.
+        \item 30\% se reservaron como conjunto de prueba.
+    \end{itemize}
+\end{itemize}
+
+\medskip
+
+\noindent\textbf{Modelos evaluados:}
+\begin{itemize}
+    \item Regresión Logística
+    \item Máquina de Vectores Soporte (SVM con kernel RBF)
+    \item Árbol de Decisión
+    \item Red Neuronal Multicapa (MLP)
+    \item k-Vecinos más Cercanos (k-NN)
+\end{itemize}
+
+Todos los modelos se entrenaron con sus hiperparámetros por defecto utilizando \texttt{scikit-learn}.
+
+\medskip
+
+\noindent\textbf{Métrica de evaluación:}  
+La métrica principal utilizada fue la \textbf{accuracy}, que representa el porcentaje de predicciones correctas en el conjunto de prueba. También se calculó un informe de clasificación con precisión, \textit{recall} y F1-score por clase, aunque estos se analizarán en secciones posteriores.
+
+\subsection{Comparación y Evaluación de Modelos Predictivos}
+
+La siguiente tabla resume los resultados obtenidos por cada modelo en términos de precisión (accuracy), ordenados de mayor a menor:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Modelo} & \textbf{Accuracy} \\
+\midrule
+Red Neuronal (MLP) & 0.625 \\
+Regresión Logística & 0.600 \\
+SVM (RBF) & 0.550 \\
+Árbol de Decisión & 0.500 \\
+k-Vecinos más Cercanos & 0.475 \\
+\bottomrule
+\end{tabular}
+\caption*{Precisión de los modelos sobre el conjunto de prueba}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{img/accuracy_modelos_basicos.png}
+\caption*{Comparación visual de accuracy entre modelos}
+\end{figure}
+
+\medskip
+
+\noindent\textbf{Análisis de resultados:}
+\begin{itemize}
+    \item El modelo con mejor rendimiento fue la \textbf{Red Neuronal Multicapa (MLP)}, con un \texttt{accuracy} del 62.5\%.
+    \item La \textbf{Regresión Logística} fue el segundo mejor modelo (60\%), combinando precisión razonable e interpretabilidad.
+    \item \textbf{SVM (RBF)} obtuvo un 55\%, seguido por el \textbf{Árbol de Decisión} (50\%).
+    \item El modelo \textbf{k-NN} fue el menos preciso, con un 47.5\% de aciertos.
+\end{itemize}
+
+\medskip
+
+\noindent\textbf{Conclusión:}  
+Aunque el modelo MLP mostró la mejor capacidad predictiva, modelos como la Regresión Logística o el Árbol de Decisión pueden ser más apropiados si se prioriza la interpretabilidad. En las próximas secciones se explorarán estrategias para mejorar el rendimiento general, incluyendo técnicas de balanceo de clases (SMOTE), creación de nuevas variables y ajuste de hiperparámetros.
+
+\subsection{Evaluación detallada del rendimiento de los modelos}
+
+Aunque el modelo con mejor precisión fue la Red Neuronal Multicapa (MLP) con un 62.5\% de \texttt{accuracy}, esta métrica global no es suficiente para entender la calidad real de sus predicciones. Para evaluar su comportamiento en mayor profundidad, se han analizado:
+
+\begin{enumerate}
+    \item La \textbf{distribución de clases} en la variable objetivo.
+    \item El \textbf{informe de clasificación por clase}.
+    \item La \textbf{matriz de confusión}.
+\end{enumerate}
+
+\subsubsection*{1. Distribución de clases en \texttt{esp}}
+
+La distribución de clases muestra un claro desequilibrio: algunas categorías tienen significativamente más ejemplos que otras, lo cual puede influir en el comportamiento del modelo y sesgar las predicciones hacia las clases mayoritarias.
+
+\vspace{0.5cm}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.55\textwidth]{img/distribucion_clases_esp.png}
+\caption*{Distribución de clases en la variable \texttt{esp}}
+\end{figure}
+\vspace{0.5cm}
+
+\subsubsection*{2. Informe de clasificación}
+
+El rendimiento del modelo MLP desglosado por clase se muestra en la siguiente tabla. Se incluyen las métricas de precisión, \textit{recall} y F1-score para cada clase:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Clase} & \textbf{Precisión} & \textbf{Recall} & \textbf{F1-score} & \textbf{Soporte} \\
+\midrule
+0 & 1.00 & 0.50 & 0.67 & 2 \\
+1 & 0.60 & 0.71 & 0.65 & 17 \\
+2 & 0.62 & 0.62 & 0.62 & 8 \\
+3 & 0.64 & 0.54 & 0.58 & 13 \\
+\midrule
+\textbf{Accuracy global} & \multicolumn{4}{c}{0.625} \\
+\textbf{Promedio macro} & 0.72 & 0.59 & 0.63 &  \\
+\textbf{Promedio ponderado} & 0.64 & 0.62 & 0.62 &  \\
+\bottomrule
+\end{tabular}
+\caption*{Informe de clasificación para el modelo MLP}
+\end{table}
+
+\textbf{Observaciones:}
+\begin{itemize}
+    \item La clase 0 alcanza una precisión perfecta, pero el bajo soporte (solo 2 instancias) impide generalizar su rendimiento.
+    \item La clase 1, mayoritaria, es la mejor clasificada, con un F1-score de 0.65.
+    \item Las clases 2 y 3 tienen valores similares, aunque la clase 3 muestra menor \textit{recall} (0.54).
+\end{itemize}
+
+\subsubsection*{3. Matriz de confusión}
+
+La matriz de confusión permite identificar cómo se distribuyen los errores del modelo entre clases reales y predichas.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{img/matriz_confusion_mlp.png}
+\caption*{Matriz de confusión del modelo MLP}
+\end{figure}
+
+\textbf{Análisis de la matriz:}
+\begin{itemize}
+    \item La clase 1 se predice correctamente en 12 de 17 casos, pero también es confundida con las clases 2 y 3.
+    \item La clase 2 se confunde especialmente con la clase 1 (3 errores) y logra 5 aciertos.
+    \item La clase 3 presenta errores repartidos, especialmente hacia la clase 1 (5 casos).
+    \item La clase 0, con solo dos ejemplos, tuvo un acierto y un error.
+\end{itemize}
+
+\textbf{Conclusión:}  
+El modelo MLP presenta un rendimiento desigual entre clases. Su precisión global es aceptable, pero existen oportunidades de mejora, especialmente en la clasificación de clases minoritarias. Esto sugiere que podrían ser necesarias estrategias adicionales como:
+\begin{itemize}
+    \item Aplicación de técnicas de balanceo como SMOTE.
+    \item Creación de variables más discriminativas.
+    \item Ajuste fino de hiperparámetros para mejorar la generalización.
+\end{itemize}
+
+\subsection{Evaluación del Modelo Red Neuronal (MLP)}
+
+Tras entrenar y evaluar el modelo de red neuronal (MLP), se analizó en detalle su rendimiento para entender sus fortalezas y limitaciones, especialmente ante la distribución desbalanceada de clases en la variable objetivo \texttt{esp}.
+
+\subsubsection*{1. Distribución de Clases}
+
+El siguiente gráfico muestra la frecuencia de cada clase en la variable \texttt{esp}, codificada de 0 a 3:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.55\textwidth]{img/distribucion_clases_esp.png}
+\caption{Distribución de clases en la variable \texttt{esp}}
+\end{figure}
+
+Se observa un claro desbalance:
+\begin{itemize}
+    \item La clase 1 es la más frecuente.
+    \item La clase 0 es extremadamente minoritaria (solo dos instancias en el conjunto de prueba).
+\end{itemize}
+
+Este desequilibrio puede hacer que el modelo tienda a favorecer las clases mayoritarias, penalizando la predicción correcta de clases menos representadas.
+
+\subsubsection*{2. Informe de Clasificación}
+
+El desempeño del MLP por clase se resume en la siguiente tabla:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Clase} & \textbf{Precisión} & \textbf{Recall} & \textbf{F1-score} & \textbf{Apoyo} \\
+\midrule
+0 & 1.00 & 0.50 & 0.67 & 2 \\
+1 & 0.56 & 0.59 & 0.57 & 17 \\
+2 & 0.62 & 0.62 & 0.62 & 8 \\
+3 & 0.54 & 0.54 & 0.54 & 13 \\
+\midrule
+\textbf{Accuracy global} & \multicolumn{4}{c}{0.625} \\
+\textbf{F1-score macro promedio} & \multicolumn{4}{c}{0.60} \\
+\bottomrule
+\end{tabular}
+\caption{Informe de clasificación detallado del modelo MLP}
+\end{table}
+
+\textbf{Observaciones:}
+\begin{itemize}
+    \item La clase 0 muestra una precisión aparente del 100\%, pero con sólo dos ejemplos, su utilidad es limitada.
+    \item Las clases 1, 2 y 3 presentan métricas similares, indicando un desempeño moderado pero desigual.
+    \item La precisión global y el F1 macro indican un rendimiento aceptable, pero mejorable.
+\end{itemize}
+
+\subsubsection*{3. Matriz de Confusión}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.48\textwidth]{img/matriz_confusion_mlp.png}
+\caption{Matriz de confusión del modelo MLP}
+\end{figure}
+
+\textbf{Errores más comunes:}
+\begin{itemize}
+    \item La clase 1 se confunde frecuentemente con las clases 2 y 3.
+    \item La clase 3 se solapa especialmente con la clase 1.
+    \item La clase 0 tiene una clasificación inconsistente por su escaso número de ejemplos.
+\end{itemize}
+
+\textbf{Conclusión:} El modelo MLP presenta un rendimiento bajo a moderado. Para mejorar se recomienda aplicar técnicas de balanceo y/o ajuste de hiperparámetros, así como considerar transformaciones adicionales de las clases si es adecuado en el contexto del dominio.
+
+\subsection{Aplicación de SMOTE y Evaluación de Modelos}
+
+Dado el desbalance detectado en las clases de \texttt{esp}, se aplicó la técnica de sobremuestreo \textbf{SMOTE (Synthetic Minority Over-sampling Technique)} sobre el conjunto de entrenamiento. Esta técnica genera muestras sintéticas para las clases menos representadas con el fin de equilibrar la distribución.
+
+\subsubsection*{Pasos realizados}
+
+\begin{enumerate}
+    \item Codificación de variables categóricas mediante \texttt{LabelEncoder}.
+    \item División del conjunto en entrenamiento (70\%) y prueba (30\%) con estratificación.
+    \item Aplicación de SMOTE sobre el conjunto de entrenamiento.
+    \item Reentrenamiento de cinco modelos clásicos:
+    \begin{itemize}
+        \item Regresión Logística
+        \item SVM (kernel RBF)
+        \item Árbol de Decisión
+        \item Red Neuronal Multicapa (MLP)
+        \item k-Vecinos más Cercanos (k-NN)
+    \end{itemize}
+    \item Evaluación de los modelos sobre el conjunto de prueba original.
+\end{enumerate}
+
+\subsubsection*{Resultados con SMOTE}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Modelo} & \textbf{Accuracy con SMOTE} \\
+\midrule
+Red Neuronal (MLP) & 0.625 \\
+Regresión Logística & 0.575 \\
+SVM (RBF) & 0.575 \\
+Árbol de Decisión & 0.575 \\
+k-Vecinos más Cercanos & 0.500 \\
+\bottomrule
+\end{tabular}
+\caption{Precisión de los modelos tras aplicar SMOTE}
+\end{table}
+
+\subsubsection*{Conclusiones tras aplicar SMOTE}
+
+\begin{itemize}
+    \item La Red Neuronal (MLP) mantiene el mejor rendimiento, alcanzando un 62.5\% de acierto.
+    \item Regresión Logística, SVM y Árbol de Decisión mejoraron ligeramente, alcanzando un 57.5\%.
+    \item El modelo k-NN sigue siendo el menos eficaz, probablemente afectado por la distorsión del espacio de características introducida por SMOTE.
+\end{itemize}
+
+\textbf{Conclusión:} SMOTE fue útil para reducir el sesgo hacia clases mayoritarias. Aunque no cambió el modelo más preciso, sí permitió una clasificación más equilibrada entre clases, lo cual es valioso en contextos educativos con representación desigual entre perfiles estudiantiles.
+
+\subsection{Aplicación de Ingeniería de Atributos}
+
+Tras evaluar el rendimiento de los modelos en etapas anteriores, incluso aplicando técnicas de balanceo como SMOTE, se observó que la precisión obtenida no era completamente satisfactoria. Esto sugiere que las variables en su estado original pueden no reflejar adecuadamente la complejidad del problema.
+
+Por ello, se decidió aplicar técnicas de \textbf{ingeniería de atributos}, que consisten en transformar o combinar variables existentes para generar nuevas representaciones con mayor capacidad informativa.
+
+\subsubsection*{Objetivos de la ingeniería de atributos}
+
+\begin{itemize}
+    \item Mejorar la representación del conocimiento del dominio.
+    \item Reducir ruido y redundancia en los datos.
+    \item Aumentar el poder predictivo de las variables.
+    \item Adaptar las características al tipo de modelo utilizado.
+\end{itemize}
+
+\subsubsection*{Nuevas variables creadas}
+
+Se diseñaron dos variables derivadas de atributos ya existentes:
+
+\begin{itemize}
+    \item \texttt{nota\_media\_anteriores}: promedio de las notas previas (\texttt{tnp} y \texttt{twp}), utilizando un mapeo ordinal (\textit{Pass}=1, \textit{Good}=2, \textit{Vg}=3, \textit{Best}=4).
+    \item \texttt{motivacion}: suma de los valores ordinales de interés en prácticas (\texttt{iap}) y actitud (\texttt{atd}), con mapeos específicos.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cccccc}
+\toprule
+\textbf{tnp} & \textbf{twp} & \textbf{nota\_media\_anteriores} & \textbf{iap} & \textbf{atd} & \textbf{motivacion} \\
+\midrule
+Good & Good & 2.0 & Vg & Good & 6 \\
+Vg & Vg & 3.0 & Vg & Average & 5 \\
+Good & Good & 2.0 & Vg & Good & 6 \\
+Pass & Good & 1.5 & Vg & Average & 5 \\
+Good & Good & 2.0 & Vg & Good & 6 \\
+\bottomrule
+\end{tabular}
+\caption{Variables derivadas a partir de información académica y actitudinal}
+\end{table}
+
+Estas variables resumen información clave del rendimiento previo y del compromiso del estudiante, facilitando su interpretación y posible impacto en la variable objetivo.
+
+\subsubsection*{Evaluación de modelos con nuevas variables (sin SMOTE)}
+
+Se reentrenaron los cinco modelos de clasificación previamente utilizados, ahora incorporando las nuevas variables, pero \textbf{sin aplicar SMOTE} para mantener la distribución original de clases.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Modelo} & \textbf{Accuracy (nuevas variables, sin SMOTE)} \\
+\midrule
+Regresión Logística & 0.625 \\
+SVM (RBF) & 0.625 \\
+k-Vecinos más Cercanos & 0.625 \\
+Árbol de Decisión & 0.600 \\
+Red Neuronal (MLP) & 0.525 \\
+\bottomrule
+\end{tabular}
+\caption{Rendimiento de los modelos con ingeniería de atributos}
+\end{table}
+
+\subsubsection*{Conclusiones}
+
+\begin{itemize}
+    \item El rendimiento general no mejoró de forma significativa tras la incorporación de nuevas variables.
+    \item k-NN, Regresión Logística y SVM obtuvieron 62.5\% de \texttt{accuracy}, resultados similares a los obtenidos anteriormente.
+    \item El modelo MLP se vio afectado negativamente, con un descenso hasta 52.5\%.
+\end{itemize}
+
+Esto sugiere que, aunque las variables \texttt{nota\_media\_anteriores} y \texttt{motivacion} tienen sentido semántico, no aportan suficiente información adicional o diferenciadora para mejorar la capacidad predictiva por sí solas.
+
+\textbf{Recomendaciones:}
+\begin{itemize}
+    \item Probar estas variables en combinación con técnicas de balanceo como SMOTE.
+    \item Utilizar modelos más complejos o ensamblados (\texttt{Random Forest}, \texttt{XGBoost}).
+    \item Evaluar la importancia de estas nuevas variables mediante análisis de características.
+\end{itemize}
+
+\subsection{Cambio de proporción en la división de datos: 80\% entrenamiento, 20\% prueba}
+
+Hasta este punto, los modelos se entrenaron con una división 70/30 entre entrenamiento y prueba. No obstante, dado que los resultados no superaban el umbral deseado de precisión, se probó una nueva partición 80/20 para evaluar si una mayor cantidad de datos de entrenamiento mejora el rendimiento general.
+
+\subsubsection*{Motivación del cambio}
+\begin{itemize}
+    \item Al usar el 80\% de los datos para entrenar, el modelo tiene más ejemplos para aprender patrones representativos.
+    \item Aunque el conjunto de prueba es más pequeño, sigue siendo suficiente para evaluar el rendimiento del modelo.
+    \item Esta estrategia es especialmente útil en presencia de clases minoritarias, que el modelo puede ver con mayor frecuencia.
+\end{itemize}
+
+\subsubsection*{Resultados del entrenamiento con división 80/20}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Modelo} & \textbf{Accuracy (80/20 split)} \\
+\midrule
+Red Neuronal (MLP) & 0.7037 \\
+Árbol de Decisión & 0.6667 \\
+Regresión Logística & 0.6296 \\
+SVM (RBF) & 0.5926 \\
+k-Vecinos más Cercanos & 0.5556 \\
+\bottomrule
+\end{tabular}
+\caption{Precisión de los modelos con división 80/20}
+\end{table}
+
+\subsubsection*{Conclusiones}
+
+\begin{itemize}
+    \item El modelo \textbf{Red Neuronal (MLP)} alcanzó un \texttt{accuracy} del \textbf{70.37\%}, superando claramente al resto.
+    \item \textbf{Árbol de Decisión} y \textbf{Regresión Logística} también mejoraron, obteniendo 66.67\% y 62.96\% respectivamente.
+    \item El modelo \textbf{k-NN} sigue siendo el de menor rendimiento, posiblemente por su sensibilidad al ruido y a la distribución local de los datos.
+\end{itemize}
+
+\medskip
+
+Este cambio de proporción ha sido una decisión efectiva que permitió mejorar el rendimiento de todos los modelos. En esta configuración, el modelo MLP se consolida como el mejor candidato para el modelo final.
+
+\subsection{Ajuste de Hiperparámetros del Modelo MLP}
+
+Dado que el modelo MLP obtuvo el mejor rendimiento, se exploró si este resultado podía mejorarse mediante ajuste de hiperparámetros con \texttt{GridSearchCV} y validación cruzada.
+
+\subsubsection*{Parámetros evaluados}
+
+\begin{itemize}
+    \item \texttt{hidden\_layer\_sizes}: (10), (20), (10,10)
+    \item \texttt{activation}: \texttt{relu}, \texttt{tanh}
+    \item \texttt{solver}: \texttt{adam}, \texttt{sgd}
+    \item \texttt{alpha}: 0.0001, 0.001
+    \item \texttt{max\_iter}: 1000
+\end{itemize}
+
+\subsubsection*{Mejor configuración encontrada}
+
+\begin{itemize}
+    \item \texttt{activation = 'relu'}
+    \item \texttt{hidden\_layer\_sizes = (10, 10)}
+    \item \texttt{solver = 'sgd'}
+    \item \texttt{alpha = 0.0001}
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Métrica} & \textbf{Valor} \\
+\midrule
+Accuracy en validación cruzada & 0.6157 \\
+Accuracy en conjunto de prueba & 0.6296 \\
+\bottomrule
+\end{tabular}
+\caption{Resultados del MLP tras ajuste de hiperparámetros}
+\end{table}
+
+\subsubsection*{Interpretación}
+
+Aunque se encontró una configuración óptima, el ajuste no mejoró el rendimiento respecto al modelo original (70.37\%). Esto sugiere que:
+
+\begin{itemize}
+    \item El MLP ya estaba bien ajustado con sus parámetros por defecto.
+    \item El espacio de búsqueda fue probablemente demasiado limitado.
+    \item Otras técnicas como \textit{early stopping}, modificación de \textit{learning rate} o incremento del número de capas podrían ser necesarias para mejorar su desempeño.
+\end{itemize}
+
+\medskip
+
+En resumen, el ajuste de hiperparámetros proporcionó información valiosa sobre el comportamiento del modelo, pero no se tradujo en una mejora significativa de su precisión.
+
+
+\section{Evaluación de la interpretabilidad de los modelos}
+
+La interpretabilidad es un criterio esencial en la selección de modelos, especialmente en contextos educativos, donde las decisiones tomadas por un sistema de predicción deben poder justificarse ante docentes, orientadores o responsables académicos.
+
+A continuación, se evalúa el nivel de interpretabilidad de cada uno de los modelos utilizados en este proyecto:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lp{10cm}}
+\toprule
+\textbf{Modelo} & \textbf{Nivel de interpretabilidad y observaciones} \\
+\midrule
+\textbf{Árbol de Decisión} & \textbf{Alta}. Puede visualizarse gráficamente como un árbol jerárquico. Las decisiones son comprensibles y rastreables hasta la predicción final. Muy útil para explicar resultados de forma clara. \\
+\textbf{Regresión Logística} & \textbf{Alta}. Los coeficientes del modelo indican el impacto relativo de cada variable. Permite justificar predicciones en términos de probabilidad. \\
+\textbf{k-Vecinos más Cercanos (k-NN)} & \textbf{Media-baja}. Se basa en la vecindad de ejemplos, pero no genera reglas explícitas. Difícil de explicar en detalle. \\
+\textbf{Red Neuronal Multicapa (MLP)} & \textbf{Baja}. Su estructura compleja con múltiples capas dificulta la trazabilidad de las decisiones. Se comporta como una “caja negra”. \\
+\textbf{SVM (kernel RBF)} & \textbf{Muy baja}. Con kernel no lineal, las decisiones son difíciles de visualizar o interpretar. Aunque puede ser eficaz, no es transparente. \\
+\bottomrule
+\end{tabular}
+\caption*{Comparación de modelos según su nivel de interpretabilidad}
+\end{table}
+
+\subsection*{Conclusión}
+
+Aunque modelos como la Red Neuronal o SVM pueden ofrecer un mejor rendimiento en términos de precisión, su baja interpretabilidad limita su utilidad en entornos donde es necesario explicar claramente las decisiones.
+
+Por esta razón, se recomienda priorizar modelos como el \textbf{Árbol de Decisión} o la \textbf{Regresión Logística} cuando el criterio de transparencia sea tan importante como la capacidad predictiva. Estos modelos permiten identificar qué variables influyen más en la clasificación y cómo se llega a cada predicción, facilitando la comunicación de los resultados a usuarios no técnicos.
+
+\section{Evaluación del coste computacional de los modelos}
+
+Además de la precisión y la interpretabilidad, es importante considerar el \textbf{coste computacional} asociado a cada modelo, tanto durante la fase de entrenamiento como en la predicción. Este coste incluye aspectos como el tiempo de cómputo, el uso de memoria y la escalabilidad.
+
+A continuación, se presenta un análisis cualitativo del coste de los cinco modelos evaluados:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lp{10cm}}
+\toprule
+\textbf{Modelo} & \textbf{Evaluación del coste computacional} \\
+\midrule
+\textbf{Regresión Logística} & \textbf{Muy bajo}. Entrenamiento rápido, predicción eficiente. Ideal para conjuntos de datos pequeños o medianos. Muy adecuado cuando se requiere bajo consumo de recursos. \\
+\textbf{Árbol de Decisión} & \textbf{Bajo}. Rápido en entrenamiento y extremadamente rápido en predicción. Escalable a grandes volúmenes de datos y fácil de implementar. \\
+\textbf{k-Vecinos más Cercanos (k-NN)} & \textbf{Medio-alto}. No requiere entrenamiento explícito, pero la fase de predicción es costosa, ya que implica calcular distancias con todos los datos del conjunto de entrenamiento. Pobre rendimiento en datasets grandes. \\
+\textbf{SVM (kernel RBF)} & \textbf{Alto}. El entrenamiento es costoso, especialmente con muchos datos o atributos. La predicción también implica operaciones matemáticas complejas. \\
+\textbf{Red Neuronal Multicapa (MLP)} & \textbf{Alto}. Requiere múltiples iteraciones y ajustes de pesos. El entrenamiento es intensivo y puede requerir aceleradores (GPU) en casos más grandes. La predicción es más eficiente, pero el modelo es pesado. \\
+\bottomrule
+\end{tabular}
+\caption*{Comparación cualitativa del coste computacional de los modelos}
+\end{table}
+
+\subsection*{Conclusión}
+
+Los modelos más eficientes desde el punto de vista del coste computacional son la \textbf{Regresión Logística} y el \textbf{Árbol de Decisión}, siendo especialmente recomendables para implementaciones en tiempo real o en sistemas con recursos limitados.
+
+Por el contrario, modelos como la \textbf{Red Neuronal (MLP)} o el \textbf{SVM} implican un coste mayor y deben utilizarse únicamente si la mejora en precisión lo justifica, o si se dispone de recursos computacionales adecuados.
+
+\section{Conclusiones finales del proyecto}
+
+Este proyecto abordó de manera integral un problema real de predicción de expectativas académicas de estudiantes mediante técnicas modernas de \textbf{Aprendizaje Automático}, siguiendo un enfoque sistemático y orientado a la interpretación práctica de los resultados.
+
+\subsection*{Logros principales}
+
+\begin{itemize}
+    \item Se realizó un \textbf{preprocesamiento exhaustivo} del conjunto de datos: limpieza, codificación, agrupación de categorías y eliminación de variables no informativas.
+    \item Se aplicaron \textbf{análisis estadísticos} como el test de Chi-cuadrado, el coeficiente de Cramér’s V y la información mutua, para guiar la selección de atributos relevantes.
+    \item Se diseñaron \textbf{nuevas variables} mediante \textit{ingeniería de atributos}, que capturan de forma más estructurada aspectos clave como el rendimiento previo y la motivación del estudiante.
+    \item Se entrenaron y compararon \textbf{cinco modelos de clasificación supervisada}, utilizando herramientas avanzadas como:
+    \begin{itemize}
+        \item \textbf{SMOTE} para balanceo de clases.
+        \item \textbf{Grid Search} para ajuste de hiperparámetros.
+        \item \textbf{Evaluación múltiple} en términos de precisión, interpretabilidad y coste computacional.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Resultados destacados}
+
+\begin{itemize}
+    \item El modelo con mejor rendimiento fue la \textbf{Red Neuronal Multicapa (MLP)}, con una precisión de \textbf{70.37\%}.
+    \item Modelos como la \textbf{Regresión Logística} y el \textbf{Árbol de Decisión} ofrecieron un equilibrio óptimo entre precisión (62.96\%), interpretabilidad y eficiencia.
+    \item Se seleccionó el modelo final considerando múltiples factores: rendimiento, coste computacional, complejidad del modelo y posibles escenarios de aplicación.
+\end{itemize}
+
+\subsection*{Aprendizajes clave}
+
+\begin{itemize}
+    \item La \textbf{precisión no es el único criterio}: interpretabilidad, coste y robustez son igualmente importantes.
+    \item Técnicas como la \textbf{ingeniería de atributos} y el \textbf{sobremuestreo con SMOTE} pueden tener un impacto significativo en la calidad del modelo.
+    \item La \textbf{validación cruzada y el ajuste de hiperparámetros} mejoran la capacidad de generalización del modelo.
+\end{itemize}
+
+\subsection*{Líneas de mejora futuras}
+
+\begin{itemize}
+    \item Probar modelos más avanzados como \textbf{Random Forest}, \textbf{Gradient Boosting} o \textbf{XGBoost}.
+    \item Incluir nuevas variables contextuales o demográficas si se dispone de información adicional.
+    \item Utilizar métricas más específicas como el \textbf{F1-score} o el \textbf{recall por clase}, especialmente en casos de desbalance.
+    \item Evaluar la \textbf{implementación del modelo en un entorno real o simulado}, para validar su utilidad práctica en contextos educativos reales.
+\end{itemize}
+
+\subsection*{Cierre}
+
+Este proyecto ha demostrado cómo aplicar de forma rigurosa y estratégica los fundamentos del aprendizaje automático, integrando análisis estadístico, modelado predictivo e interpretación de resultados, todo ello con un enfoque práctico y orientado a la toma de decisiones educativas.
+
 \newpage
-\addcontentsline{toc}{section}{Bibliografía}
+
 \begin{thebibliography}{9}
 
-\bibitem{Aho2007}
-Aho, A. V., Lam, M. S., Sethi, R., \& Ullman, J. D. (2007).  
-\textit{Compiladores: Principios, técnicas y herramientas}.  
-Pearson Educación. Obra clásica sobre teoría de compiladores, autómatas, gramáticas y análisis léxico-sintáctico.
+\bibitem{scikit-learn}
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., Vanderplas, J., Passos, A., Cournapeau, D., Brucher, M., Perrot, M., \& Duchesnay, É. (2011).
+\textit{Scikit-learn: Machine Learning in Python}.
+Journal of Machine Learning Research, 12, 2825–2830.
 
-\bibitem{BeazleyPLY}
-Beazley, D. (2023).  
-\textit{PLY (Python Lex-Yacc) Documentation}.  
-Disponible en: \url{https://www.dabeaz.com/ply/}  
-Documentación oficial de la librería utilizada para construir analizadores léxicos y sintácticos en Python.
+\bibitem{imbalanced-learn}
+Lemaître, G., Nogueira, F., \& Aridas, C. K. (2017).
+\textit{Imbalanced-learn: A Python Toolbox to Tackle the Curse of Imbalanced Datasets in Machine Learning}.
+Journal of Machine Learning Research, 18(17), 1–5.
 
-\bibitem{BeautifulSoup}
-Richardson, L. (2023).  
-\textit{BeautifulSoup Documentation}.  
-Disponible en: \url{https://www.crummy.com/software/BeautifulSoup/}  
-Manual y referencias para el uso del parser HTML más extendido en Python.
+\bibitem{mitchell}
+Mitchell, T. M. (1997).
+\textit{Machine Learning}.
+McGraw-Hill.
 
-\bibitem{HTMLSpec}
-WHATWG. (2024).  
-\textit{HTML Living Standard}.  
-Disponible en: \url{https://html.spec.whatwg.org/}  
-Especificación oficial y actualizada del lenguaje HTML mantenida por el grupo WHATWG.
-
-\bibitem{Graphviz}
-Graphviz Team. (2024).
-Disponible en: \url{https://graphviz.org/}  
-Herramienta empleada para la generación visual de los autómatas finitos representados en esta práctica.
-
-\bibitem{PythonDocs}
-Python Software Foundation. (2024).  
-\textit{Documentación oficial de Python}.  
-Disponible en: \url{https://docs.python.org/3/}  
-Referencia completa del lenguaje de programación utilizado en el desarrollo del proyecto.
+\bibitem{hastie}
+Hastie, T., Tibshirani, R., \& Friedman, J. (2009).
+\textit{The Elements of Statistical Learning: Data Mining, Inference, and Prediction}.
+Springer.
 
 \end{thebibliography}
-
-
-\end{document}
-
-
 
 \end{document}
